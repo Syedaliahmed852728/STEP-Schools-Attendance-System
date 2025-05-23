@@ -1,0 +1,455 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif !important;
+    font-optical-sizing: auto;
+    /* font-weight: 600; */
+    font-style:normal;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+}
+
+body{
+    height: 100vh;
+    background-color: rgba(213, 196, 196, 0.658) !important ;
+    text-align: center;
+    padding: 1rem;
+}
+/* header section starts */
+.header{
+    max-width: 1280px;
+    padding: 1rem;
+    margin: 0  auto ;
+    display: flex;
+    justify-content:space-between;
+    align-items:center;
+
+
+}
+
+#logo_img{
+    width: 100px;
+    height: 70px;
+    border-radius: 10px;
+    border: 2px solid #2d2b6f ;
+
+}
+.title{
+    display: flex;
+    flex-direction: column;
+    gap: 1px !important;
+    align-items: center;
+    justify-content: center;
+}
+#title_name_heading{
+    font-size: 22px;
+    color: #2d2b6f;
+    font-weight: bold !important;
+
+}
+#title_name_city{
+    font-weight: bold !important;
+    color: rgb(192, 59, 59) ;
+}
+.top_menu{
+     
+    padding: 3px;
+    margin: 3px;
+    font-weight: 600 !important;
+    color: #2d2b6f;
+}
+.top_menu:hover{
+    color: rgb(118, 111, 111);
+}
+
+.menu_image{
+    display: none;
+}
+.main_Container{
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: auto;
+    padding: 2rem;
+    
+}
+.main_heading{
+ 
+ display: flex;
+ gap: 1rem;
+
+}
+.static_txt {
+    color: rgb(192, 59, 59);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: bold !important;
+}
+
+.dynamic_txt {
+    color: #2d2b6f;
+    font-size: 1.5rem;
+    white-space: nowrap;       /* Prevents text from wrapping */
+    overflow: hidden;          /* Hides the overflow text */
+    width: 0;                  /* Starts with no width (invisible) */
+    animation: typing 2s steps(25) forwards;
+    font-weight: bold !important;
+}
+
+@keyframes typing {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+.Stud_menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    gap: 2rem;
+    font-weight: bold;
+    background-color: rgba(231, 230, 240, 0.712);
+    width: 60%;
+    height: 100px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 10px 0;
+    position: relative;
+    overflow: visible;
+}
+
+.menu_desig {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    height: 70px; /* Fixed height to prevent shifting */
+}
+
+.text_menu {
+    font-weight: bold;
+    color: #2d2b6f;
+    font-size: 1rem;
+    margin-top: 10px;
+    position: relative;
+    height: 20px; /* Fixed height to prevent shift */
+}
+
+.icon_menu {
+    width: 45px;
+    height: 45px;
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border 0.3s ease-out, width 0.3s, height 0.3s;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    padding: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.menu_desig:hover .icon_menu {
+    transform: translateY(-30px); /* Moves up smoothly */
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(213, 196, 196, 0.781);
+
+    background-color: #e8e8e8;
+}
+
+
+/* here i am  making it responsive */
+@media (max-width:780px){
+    .top_menu{
+        display: none;
+    }
+    .botton{
+        display: none;
+    }
+    .menu_image{
+        display: block;
+    }
+    .Menu-option-image{
+        width: 35px;
+        height: 35px;
+    }
+}
+
+
+  /* search */
+.glass {
+    background: rgba(255,255,255,0.9);
+    border-radius: 1rem;
+    backdrop-filter: blur(8px);
+    border: 1px solid #ddd;
+  }
+  .text-gradient {
+    background: linear-gradient(90deg,#00c6ff,#0072ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .custom-close {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .custom-close:hover { opacity: 1; }
+  .table tbody tr:hover {
+    background-color: rgba(0, 114, 255, 0.05);
+  }
+  .badge {
+    font-size: 0.85em;
+    padding: 0.5em 0.75em;
+  }
+  /* backround for all fiters section ,record founded section and record not founded section */
+/* 🔷 Common container for filters + search */
+.common_background {
+    display: flex;
+    align-items: center; /* Perfect vertical alignment */
+    justify-content: center;
+    margin: 5px;
+    gap: 1rem;
+    background-color: rgba(231, 230, 240, 0.712);
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 10px 0;
+    position: relative;
+    overflow: visible;
+    flex-wrap: wrap; /* Allows responsive wrapping */
+}
+
+/* 🔷 Class & Section filters container */
+.filter_search_background {
+    display: flex;
+    align-items: center; /* Ensure search + dropdowns are aligned */
+    justify-content: space-around;
+    padding: 20px;
+    background-color: rgba(231, 230, 240, 0.712);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    gap: 2rem;
+    flex-wrap: wrap;
+    transition: all 0.3s ease;
+    height: 125px;
+}
+
+/* 🔷 Dropdown container */
+.class_section_filter_headings {
+    display: flex;
+    gap: 0.1rem;
+    align-items: center;
+    background-color: #ffffff;
+    width: 280px;
+    height: 50px;
+    padding: 10px;
+    border: 2px solid #2d2b6f;
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #2d2b6f;
+    transition: transform 0.3s ease;
+}
+.class_section_filter_headings:hover {
+    transform: translateY(-3px);
+}
+
+/* 🔷 Class & section dropdowns */
+#class_selection,
+#section_selection {
+    width: 220px;
+    max-height: 45px;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold !important;
+    color: rgb(192, 59, 59);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    animation: dropdownFadeIn 0.3s linear;
+}
+#class_selection option,
+#section_selection option {
+    background-color: #f3f3fab5;
+    color: #6b6b77;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: monospace;
+}
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+/* 🔷 Filter labels */
+.filters_headings {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #2d2b6f;
+    margin-bottom: 5px;
+}
+
+/* 🔷 Search area wrapper (now vertically aligned perfectly) */
+.search_headings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px; /* Match dropdown height */
+    margin: 0; /* Reset margin for clean line alignment */
+}
+
+/* 🔷 Inner search bar container */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 12px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    height: 50px; /* Match dropdown height */
+}
+
+/* 🔷 Hidden until hover input */
+.search-input {
+    width: 0px;
+    opacity: 0;
+    height: 40px;
+    padding: 0px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    background-color: #ffffff;
+    color: #2d2b6f;
+    transition: all 0.4s ease;
+}
+
+/* 🔷 Expand on focus or hover */
+.search-wrapper:hover .search-input,
+.search-input:focus {
+    width: 240px;
+    opacity: 1;
+    padding: 0 12px;
+}
+
+/* 🔷 Round search button */
+.search-button {
+    background-color: #ffffff;
+    border: 2px solid #2d2b6f;
+    border-radius: 50%;
+    padding: 10px;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* 🔷 Hover effect */
+.search-button:hover {
+    background-color: rgb(192, 59, 59);
+    transform: scale(1.05);
+}
+
+/* 🔷 SVG Icon */
+.search-icon {
+    width: 40px;
+    height: 40px;
+    stroke: rgb(192, 59, 59);
+    stroke-width: 2;
+    transition: stroke 0.3s ease;
+}
+.search-button:hover .search-icon {
+    stroke: #2d2b6f;
+
+}
+
+/* record founded section */
+.record_founded_background{
+    min-height: 150px;
+    display: flex;
+    align-items: self-start;
+    margin-top: 2rem;
+}
+.table_founded_student {
+  margin: 1rem;  
+  padding: 0.7rem;
+  width: 90%;
+  border: #2d2b6f solid 2px;
+  border-radius: 10px;
+  border-collapse: separate;
+  overflow: hidden;
+  background-color: white;
+  text-align: center;
+}
+
+
+.student_header th {
+  background-color: #ffffff;
+  color: #2d2b6f;
+  padding: 10px 20px;
+  text-align: center;
+  
+}
+
+.student_data {
+  color: rgb(192, 59, 59);
+  font-weight: bold;
+  padding: 10px 20px;
+}
+/* edit btn */
+.edit_btn{
+    line-height: 35px;
+    width: 120px;
+    height: 45px;
+    background-color: rgb(192, 59, 59);
+    border: 2px solid #2d2b6f ;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center; 
+    padding: 0;
+    margin: 5px;
+    font-size: small;
+}
+.edit_btn_design{
+color: azure;
+}
+.edit_btn:hover{
+    box-shadow: 0 0 3px rgb(192, 59, 59);
+    background-color: black;
+    border:2px solid rgb(192, 59, 59);
+    transition: all 1s;
+}
+/* record not fonded */
+.record_not_founded_background{
+min-height: 150px;
+display: flex;
+    align-items: self-start;
+    margin-top: 2rem;
+}
+.record_not_found{
+    margin-top: 20px;
+    background-color:rgb(192, 59, 59);
+    width: 90%;
+    color: #2d2b6f;
+    font-weight: bold;
+    font-size: 2rem;
+    text-align: center;
+    border-radius: 10px;
+}
+

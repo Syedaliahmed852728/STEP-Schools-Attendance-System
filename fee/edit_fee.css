@@ -1,0 +1,147 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif !important;
+    font-optical-sizing: auto;
+    /* font-weight: 600; */
+    font-style:normal;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+}
+
+body{
+    height: 100vh;
+    background-color: rgba(213, 196, 196, 0.658) !important ;
+    text-align: center;
+    padding: 1rem;
+}
+/* header section starts */
+.header{
+    max-width: 1280px;
+    padding: 1rem;
+    margin: 0  auto ;
+    display: flex;
+    justify-content:space-between;
+    align-items:center;
+
+
+}
+
+#logo_img{
+    width: 100px;
+    height: 70px;
+    border-radius: 10px;
+    border: 2px solid #2d2b6f ;
+
+}
+.title{
+    display: flex;
+    flex-direction: column;
+    gap: 1px !important;
+    align-items: center;
+    justify-content: center;
+}
+#title_name_heading{
+    font-size: 22px;
+    color: #2d2b6f;
+    font-weight: bold !important;
+
+}
+#title_name_city{
+    font-weight: bold !important;
+    color: rgb(192, 59, 59) ;
+}
+.top_menu{
+     
+    padding: 3px;
+    margin: 3px;
+    font-weight: 600 !important;
+    color: #2d2b6f;
+}
+.top_menu:hover{
+    color: rgb(118, 111, 111);
+}
+
+.menu_image{
+    display: none;
+}
+.main_Container{
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: auto;
+    padding: 2rem;
+    
+}
+.main_heading{
+ 
+ display: flex;
+ gap: 1rem;
+
+}
+.static_txt {
+    color: rgb(192, 59, 59);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: bold !important;
+}
+
+.dynamic_txt {
+    color: #2d2b6f;
+    font-size: 1.5rem;
+    white-space: nowrap;       /* Prevents text from wrapping */
+    overflow: hidden;          /* Hides the overflow text */
+    width: 0;                  /* Starts with no width (invisible) */
+    animation: typing 2s steps(25) forwards;
+    font-weight: bold !important;
+}
+
+@keyframes typing {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+
+
+    /* Enhanced Close Button Positioning */
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background: var(--danger-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(235, 77, 85, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+
+    .close-btn:hover {
+        transform: scale(1.1) rotate(90deg);
+        background: #ff2a2a;
+    }
+
+    
+    /* Existing Preserved Styles */
+    .glassmorphic-card {
+        
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+   
