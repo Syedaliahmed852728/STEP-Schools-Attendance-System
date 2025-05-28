@@ -106,42 +106,102 @@ body{
         width: 100%;
     }
 }
+   /* section to view close btn and view details */
 
-
-
-    /* Enhanced Close Button Positioning */
-    .close-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
+    .details_container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgb(192, 59, 59);
+    width: 800px;
+    height: 100px;
+    margin:auto;
+    margin-top: 2rem;
+   }
+    /*Close Button*/
+    .close_btn {
+        padding: auto;
+        margin: auto;
+        margin-right: 2rem; 
         width: 40px;
         height: 40px;
-        background: var(--danger-color);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 15px rgba(235, 77, 85, 0.3);
+        box-shadow: 0 0 15px rgba(235, 77, 85, 0.3);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
     }
 
-    .close-btn:hover {
-        transform: scale(1.1) rotate(90deg);
-        background: #ff2a2a;
+    .close_btn:hover {
+        transform: scale(1.1) rotate(180deg);
+        background: rgb(192, 59, 59);
     }
 
+    /* dislpay name and reg # */
+    .fixed_details{
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-left: 4rem;
+    }
+    .stud_name,.stud_session{
+        color: #2d2b6f;
+    }
+    .stud_reg,.stud_session_name{
+        color: rgb(192, 59, 59);
+    }
+    /* fee table */
+    .tab-current-class{
+        background: rgb(248, 246, 243);
+        border-radius: 10px;
+        width: 70%;
+        min-height: 100px;
+        height: auto;
+        margin: auto;
+        margin-top: 3rem;
+    }
+    .fee_header th {
+  background-color:#2d2b6f;
+  color: azure;
+  padding: 10px 50px;
+  text-align: center;
+  border-radius: 10px;
+
+  
+}
+    /* .fee_header_row{
+     
+    }
+    .fee_body{
+
+    } */
+
+    .view_btn{
+    background-color: rgb(192, 59, 59);
+    border: 2px solid #2d2b6f ;
+    border-radius: 10px;
     
-    /* Existing Preserved Styles */
-    .glassmorphic-card {
-        
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-        padding: 2rem;
-        margin-bottom: 2rem;
-    }
-
-   
+}
+.btn{
+color: azure;
+    line-height: 35px;
+    width: 120px;
+    height: 45px;
+    background-color: rgb(192, 59, 59);
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center; 
+    padding: 0;
+    margin: 5px;
+    font-size: small;
+}
+.view_btn:hover{
+    box-shadow: 0 0 3px rgb(192, 59, 59);
+    background-color: black;
+    border:2px solid rgb(192, 59, 59);
+    transition: all 1s;
+}

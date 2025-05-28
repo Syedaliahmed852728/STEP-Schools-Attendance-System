@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="fee_management.css">
+    <link rel="stylesheet" href="class_manage.css">
     <link rel="shortcut icon" href="../web_images/logo.png" type="image/x-icon">
-    <title>FEE Management</title>
+    <title>Class Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Bootstrap CSS -->
@@ -19,9 +19,9 @@
         <nav>
             <a class="top_menu" href="../index.html">Home</a>
             <a class="top_menu" href="../student/student_index.html">Students</a>
-            <a class="top_menu" href="../classes/class_manage.html">Classes</a>
-            <a class="top_menu" href="../Attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="fee_management.html">Fee</a>
+            <a class="top_menu" href="class_manage.html">Classes</a>
+            <a class="top_menu" target="_blank" href="../Attendance/attendance_index.html">Attendance</a>
+            <a class="top_menu" href="../fee/fee_management.html">FEE</a>
             <a class="top_menu" href="../history/history.html">History</a>
         </nav>
         <div class="title">
@@ -35,13 +35,14 @@
         </div>
     
     </header>
-    <!-- edit fee details -->
-     <section class="main_Container">
+    <section class="main_Container">
        <div class="main_heading" >
-        <h1 class="static_txt">Student </h1>
-        <h1 class="dynamic_txt">FEE Management</h1>
+        <h1 class="static_txt">Class</h1>
+        <h1 class="dynamic_txt">Management</h1>
        </div>
     </section>
+
+
 
   <!-- filters and search bar -->
 <section class="common_background filter_search_background">
@@ -83,20 +84,6 @@
   </select>
   </div>
   
-  <!-- fee status  filter-->
-  <div class="class_section_filter_headings">
-  <h1 class="filters_headings">Status:</h1>
-  <select name="section" id="section_selection">
-      
-  <option value="option"> </option>
-      <!-- it will includ all status pending paid overdue -->
-      <option value="option0">All Status </option> 
-      <option value="option1">Pending</option>
-      <option value="option2">Paid</option>
-      <option value="option3">Overdue</option>
-  </select>
-  </div>
-  
   <!-- search  button -> stud_id: -->
   <div class="search_headings">
   <div class="search-wrapper">
@@ -119,32 +106,28 @@
   <table class="table_founded_student">
     <thead>
       <tr class="student_header">
-        <th class="student_data">ID</th>
-        <th class="student_data">Name</th>
+        <th class="student_data">Class-code</th>
         <th class="student_data">Class</th>
         <th class="student_data">Section</th>
-        <th class="student_data">Session</th>
-        <th class="student_data">Fee Status</th>
+        <th class="student_data">Students</th>
         <th class="student_data">Action</th>
       </tr>
     </thead>
-       <!-- here all student result will be display -->
+       <!-- here all filtered/searched classes result will be display -->
        <!-- it is not realistic data but "VIEW DETAILS " is perfect button--> 
       <tbody class="table_body">
        <!-- here is backend code needed to display result according to filters and search button -->
-        <!-- search button have to display student id or by name -->
+        <!-- search button have to display  data according to class code/id -->
         <tr class="table_body_row">
-          <td class="table_body_data">FY1001</td>
-          <td class="table_body_data">Abuzar Hassan</td>
+          <td class="table_body_data">FY1-2025</td>
           <td class="table_body_data"><span class="badge bg-primary">Foundation 1</span></td>
           <td class="table_body_data"><span class="badge bg-info">NONE</span></td>
-          <td class="table_body_data">FY1-2025</td>
-          <!-- here current fee status will be display of curent month -->
-          <td class="table_body_data"><span class="badge bg-primary">Pending</span></td> 
+          <!-- display number of all current enrolled student  -->
+          <td class="table_body_data"><span class="badge bg-primary">25</span></td> 
           <td class="view_btn">
             <!-- here view_student.html is linked so as user clicked to view details then it will go to that page -->
             <div class="view_action-buttons">
-              <a href="edit_fee.html" class="view_btn_design">EDIT</a>
+              <a href="view_class_details.html" class="view_btn_design">VIEW DETAILS</a>
             </div>
           </td>
 
@@ -159,18 +142,16 @@
   <table class="table_founded_student">
       <thead>
         <tr class="student_header">
-          <th class="student_data">ID</th>
-          <th class="student_data">Name</th>
-          <th class="student_data">Class</th>
-          <th class="student_data">Section</th>
-          <th class="student_data">Session</th>
-          <th class="student_data">Fee Status</th>
-          <th class="student_data">Action</th>
+        <th class="student_data">Class-code</th>
+        <th class="student_data">Class</th>
+        <th class="student_data">Section</th>
+        <th class="student_data">Students</th>
+        <th class="student_data">Action</th>
         </tr>
       </thead>
 
   </table>
   <article class="record_not_found">No Records Found...</article>
 </section>
- 
-    
+</body>
+</html>
