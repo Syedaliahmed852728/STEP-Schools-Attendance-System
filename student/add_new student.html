@@ -83,7 +83,7 @@
         </div>
 
         <div class="col-md-4 animated fadeIn delay-2">
-          <label class="form-label">Season</label>
+          <label class="form-label">Session</label>
             <input name="Season" class="form-control" required>  
             <!-- SEASON WE HAVE DECIDED AS SEASON WILL BE CLASS CODE/(ID) LIKE FY1-2025 -->
 
@@ -142,8 +142,11 @@
 
         <div class="col-12 animated fadeIn delay-7">
           <label class="form-label">Upload Photo</label>
-          <input type="file" name="image" class="form-control">
+          <input type="file" name="image" class="form-control" id="imageInput" accept="image/*">
+          <small id="fileError" style="color:red; display:none;">Only image files (.jpg, .png, etc.) are allowed.</small>
         </div>
+
+
 
         <div class="col-12 text-center mt-4 animated fadeIn delay-8">
           <button type="submit" class="btn btn-advanced px-5 py-3">💾 Save Student</button>
@@ -153,5 +156,23 @@
     </form>
   </div>
 </div>
+<script>
+  document.getElementById('imageInput').addEventListener('change', function () {
+    const file = this.files[0];
+    const error = document.getElementById('fileError');
+
+    if (file) {
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/bmp', 'image/webp'];
+
+      if (!validImageTypes.includes(file.type)) {
+        error.style.display = 'block';
+        this.value = ''; // clear the invalid file
+      } else {
+        error.style.display = 'none';
+      }
+    }
+  });
+</script>
+
 </body>
 </html>
