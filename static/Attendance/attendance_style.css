@@ -95,21 +95,44 @@ body{
 
 /* attendance bg */
 
-.attendance_bg{
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    flex-direction: column;
-    gap: 5px;
-    background-color: azure;
-    width: 100%;
-    min-height: 150px;
-    border: 2px solid #2d2b6f;
-    border-radius: 10px;
-    padding: 1rem;
-    margin: auto;
-    margin-bottom: 3rem;
+.attendance_bg {
+  position: relative;
+  width: 900px; /* exactly the width of bg.png */
+  margin: 0 auto 3rem;
+  height: 600px; /* exactly the height of bg.png */
 }
+.attendance_bg .bg_image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Overlays */
+.camera_overlay,
+.mode_overlay{
+  position: absolute;
+  pointer-events: none;
+}
+/* Camera feed in left panel */
+.camera_overlay {
+  top: 140px;  /* tweak to your left box y-offset */
+  left: 80px;  /* tweak to your left box x-offset */
+  width: 375px; /* match left box width */
+  height: 400px; /* match left box height */
+  object-fit: cover;
+  pointer-events: none;
+  border-radius: 5px;
+}
+/* Mode indicator in right panel */
+.mode_overlay {
+  top: 30px;  /* same vertical offset as camera */
+  left: 530px; /* tweak to right box x-offset */
+  width: 365px; /* match right box width */
+  height: 505px; /* match right box height */
+  object-fit: contain;
+  pointer-events: none;
+}
+/* Button overlay */
 .bg_btn{
      display: flex;
     gap: 1rem;
@@ -141,7 +164,21 @@ body{
     border: #2d2b6f solid 2px;
 }
 
-.bg_img{
-    margin-bottom: 1rem;
-    border: #2d2b6f 3px solid;
+/* Attendance Info below */
+.attendance_info {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: azure;
+  border: 2px solid #2d2b6f;
+  border-radius: 10px;
+  text-align: left;
+}
+.attendance_info .info_heading {
+  font-size: 1.5rem;
+  color: #2d2b6f;
+  margin-bottom: 0.5rem;
+}
+.attendance_info .info_para {
+  color: #000;
 }

@@ -1,91 +1,87 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
-*{
+* {
     margin: 0;
     padding: 0;
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
-    /* font-weight: 600; */
-    font-style:normal;
+    font-style: normal;
     text-decoration: none !important;
     box-sizing: border-box;
 }
 
-body{
+body {
     height: 100vh;
     background-color: rgba(213, 196, 196, 0.658) !important;
     text-align: center;
     padding: 1rem;
 }
+
 /* header section starts */
-.header{
+.header {
     max-width: 1280px;
     padding: 1rem;
-    margin: 0  auto ;
+    margin: 0 auto;
     display: flex;
-    justify-content:space-between;
-    align-items:center;
-
-
+    justify-content: space-between;
+    align-items: center;
 }
 
-#logo_img{
+#logo_img {
     width: 100px;
     height: 70px;
     border-radius: 10px;
-    border: 2px solid #2d2b6f ;
-
+    border: 2px solid #2d2b6f;
 }
-.title{
+
+.title {
     display: flex;
     flex-direction: column;
     gap: 1px;
     align-items: center;
     justify-content: center;
 }
-#title_name_heading{
+
+#title_name_heading {
     font-size: 22px;
     color: #2d2b6f;
     font-weight: bold;
+}
 
-}
-#title_name_city{
+#title_name_city {
     font-weight: bold;
-    color: rgb(192, 59, 59) ;
+    color: rgb(192, 59, 59);
 }
-.top_menu{
-     
+
+.top_menu {
     padding: 3px;
     margin: 3px;
     font-weight: 600 !important;
-    color: #2d2b6f
-    ;
+    color: #2d2b6f;
 }
-.top_menu:hover{
+
+.top_menu:hover {
     color: rgb(118, 111, 111);
 }
 
-.menu_image{
+.menu_image {
     display: none;
 }
 
-
 /* End of header Section with responsive */
-
-.main_Container{
+.main_Container {
     display: flex;
     align-items: center !important;
     justify-content: center !important;
     margin: auto;
     padding: 2rem;
-    
 }
-.main_heading{
- 
- display: flex;
- gap: 1rem;
 
+.main_heading {
+    display: flex;
+    gap: 1rem;
 }
+
 .static_txt {
     color: rgb(192, 59, 59);
     font-size: 1.5rem;
@@ -96,9 +92,9 @@ body{
 .dynamic_txt {
     color: #2d2b6f;
     font-size: 1.5rem;
-    white-space: nowrap;       /* Prevents text from wrapping */
-    overflow: hidden;          /* Hides the overflow text */
-    width: 0;                  /* Starts with no width (invisible) */
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
     animation: typing 2s steps(25) forwards;
     font-weight: bold !important;
 }
@@ -111,6 +107,7 @@ body{
         width: 100%;
     }
 }
+
 .Stud_menu {
     display: flex;
     align-items: center;
@@ -136,7 +133,7 @@ body{
     flex-direction: column;
     text-align: center;
     position: relative;
-    height: 70px; /* Fixed height to prevent shifting */
+    height: 70px;
 }
 
 .text_menu {
@@ -145,7 +142,7 @@ body{
     font-size: 1rem;
     margin-top: 10px;
     position: relative;
-    height: 20px; /* Fixed height to prevent shift */
+    height: 20px;
 }
 
 .icon_menu {
@@ -161,38 +158,38 @@ body{
 }
 
 .menu_desig:hover .icon_menu {
-    transform: translateY(-30px); /* Moves up smoothly */
+    transform: translateY(-30px);
     width: 60px;
     height: 60px;
     border: 5px solid rgba(213, 196, 196, 0.781);
-
     background-color: #e8e8e8;
 }
 
+/* list all current enrolled students */
+.heading_current {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    gap: 2px;
+    margin: auto;
+}
 
-/* list  all current Enrolled students */
-.heading_current{
- display: flex;
- flex-direction: column;
- align-items: center;
- padding: 2rem;
- gap: 2px;
- margin: auto;
+.display_heading_current {
+    font-weight: bold !important;
+    color: #2d2b6f;
+    font-size: 25px;
 }
-.display_heading_current{
-font-weight: bold !important;
-color: #2d2b6f;
-font-size: 25px;
+
+.lead_text {
+    font-size: 15px;
+    font-weight: 500;
 }
-.lead_text{
-font-size: 15px;
-font-weight: 500;
-}
-/* backround for all fiters section ,record founded section and record not founded section */
-/* 🔷 Common container for filters + search */
+
+/* common container for filters + search */
 .common_background {
     display: flex;
-    align-items: center; /* Perfect vertical alignment */
+    align-items: center;
     justify-content: center;
     margin: 5px;
     gap: 1rem;
@@ -203,13 +200,13 @@ font-weight: 500;
     padding: 10px 0;
     position: relative;
     overflow: visible;
-    flex-wrap: wrap; /* Allows responsive wrapping */
+    flex-wrap: wrap;
 }
 
-/* 🔷 Class & Section filters container */
+/* filters + search background */
 .filter_search_background {
     display: flex;
-    align-items: center; /* Ensure search + dropdowns are aligned */
+    align-items: center;
     justify-content: space-around;
     padding: 20px;
     background-color: rgba(231, 230, 240, 0.712);
@@ -221,7 +218,7 @@ font-weight: 500;
     height: 125px;
 }
 
-/* 🔷 Dropdown container */
+/* dropdown container */
 .class_section_filter_headings {
     display: flex;
     gap: 0.1rem;
@@ -236,13 +233,15 @@ font-weight: 500;
     color: #2d2b6f;
     transition: transform 0.3s ease;
 }
+
 .class_section_filter_headings:hover {
     transform: translateY(-3px);
 }
 
-/* 🔷 Class & section dropdowns */
+/* Class, Section & Status dropdowns */
 #class_selection,
-#section_selection {
+#section_selection,
+#status_selection {
     width: 220px;
     max-height: 45px;
     padding: 10px;
@@ -254,8 +253,10 @@ font-weight: 500;
     border: none;
     animation: dropdownFadeIn 0.3s linear;
 }
+
 #class_selection option,
-#section_selection option {
+#section_selection option,
+#status_selection option {
     background-color: #f3f3fab5;
     color: #6b6b77;
     padding: 10px;
@@ -263,6 +264,7 @@ font-weight: 500;
     font-weight: 600;
     font-family: monospace;
 }
+
 @keyframes dropdownFadeIn {
     from {
         opacity: 0;
@@ -274,7 +276,7 @@ font-weight: 500;
     }
 }
 
-/* 🔷 Filter labels */
+/* filter labels */
 .filters_headings {
     font-size: 1.1rem;
     font-weight: bold;
@@ -282,16 +284,16 @@ font-weight: 500;
     margin-bottom: 5px;
 }
 
-/* 🔷 Search area wrapper (now vertically aligned perfectly) */
+/* search headings wrapper */
 .search_headings {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 50px; /* Match dropdown height */
-    margin: 0; /* Reset margin for clean line alignment */
+    height: 50px;
+    margin: 0;
 }
 
-/* 🔷 Inner search bar container */
+/* inner search bar container */
 .search-wrapper {
     display: flex;
     align-items: center;
@@ -299,10 +301,10 @@ font-weight: 500;
     border-radius: 12px;
     padding: 8px 12px;
     transition: all 0.3s ease;
-    height: 50px; /* Match dropdown height */
+    height: 50px;
 }
 
-/* 🔷 Hidden until hover input */
+/* hidden until hover or focus */
 .search-input {
     width: 0px;
     opacity: 0;
@@ -317,7 +319,7 @@ font-weight: 500;
     transition: all 0.4s ease;
 }
 
-/* 🔷 Expand on focus or hover */
+/* expand on hover or focus */
 .search-wrapper:hover .search-input,
 .search-input:focus {
     width: 240px;
@@ -325,7 +327,7 @@ font-weight: 500;
     padding: 0 12px;
 }
 
-/* 🔷 Round search button */
+/* round search button */
 .search-button {
     background-color: #ffffff;
     border: 2px solid #2d2b6f;
@@ -340,13 +342,12 @@ font-weight: 500;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* 🔷 Hover effect */
 .search-button:hover {
     background-color: rgb(192, 59, 59);
     transform: scale(1.05);
 }
 
-/* 🔷 SVG Icon */
+/* SVG icon styles */
 .search-icon {
     width: 40px;
     height: 40px;
@@ -354,81 +355,81 @@ font-weight: 500;
     stroke-width: 2;
     transition: stroke 0.3s ease;
 }
+
 .search-button:hover .search-icon {
     stroke: #2d2b6f;
-
 }
 
 /* record founded section */
-.record_founded_background{
+.record_founded_background {
     min-height: 150px;
     display: flex;
     align-items: self-start;
     margin-top: 2rem;
 }
-.table_founded_student {
-  margin: 1rem;
-  padding: 0.7rem;  
-  width: 90%;
-  border: #2d2b6f solid 2px;
-  border-radius: 10px;
-  border-collapse: separate;
-  overflow: hidden;
-  background-color: white;
-  text-align: center;
-}
 
+.table_founded_student {
+    margin: 1rem;
+    padding: 0.7rem;
+    width: 90%;
+    border: #2d2b6f solid 2px;
+    border-radius: 10px;
+    border-collapse: separate;
+    overflow: hidden;
+    background-color: white;
+    text-align: center;
+}
 
 .student_header th {
-  background-color: #ffffff;
-  color: #2d2b6f;
-  padding: 10px 20px;
-  text-align: center;
-
-  
+    background-color: #ffffff;
+    color: #2d2b6f;
+    padding: 10px 20px;
+    text-align: center;
 }
-
 
 .student_data {
-  color: rgb(192, 59, 59);
-  font-weight: bold;
-  text-align: center;
-  padding: 10px 20px;
+    color: rgb(192, 59, 59);
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 20px;
 }
 
-.view_btn{
+.view_btn {
     line-height: 35px;
     width: 120px;
     height: 45px;
     background-color: rgb(192, 59, 59);
-    border: 2px solid #2d2b6f ;
+    border: 2px solid #2d2b6f;
     border-radius: 10px;
     font-weight: bold;
-    text-align: center; 
+    text-align: center;
     padding: 0;
     margin: 5px;
     font-size: small;
 }
-.view_btn_design{
-color: azure;
+
+.view_btn_design {
+    color: azure;
 }
-.view_btn:hover{
+
+.view_btn:hover {
     box-shadow: 0 0 3px rgb(192, 59, 59);
     background-color: black;
-    border:2px solid rgb(192, 59, 59);
+    border: 2px solid rgb(192, 59, 59);
     transition: all 1s;
 }
 
-/* record not fonded */
-.record_not_founded_background{
-min-height: 150px;
-display: flex;
+/* record not founded */
+.record_not_founded_background {
+    min-height: 150px;
+    display: flex;
     align-items: self-start;
     margin-top: 2rem;
 }
-.record_not_found{
+
+.record_not_found {
     margin-top: 20px;
-    background-color:rgb(192, 59, 59);
+    background-color: rgb(192, 59, 59);
     width: 90%;
     color: #2d2b6f;
     font-weight: bold;
@@ -437,18 +438,18 @@ display: flex;
     border-radius: 10px;
 }
 
-/* here i am  making it responsive */
-@media (max-width:780px){
-    .top_menu{
+/* responsive adjustments */
+@media (max-width: 780px) {
+    .top_menu {
         display: none;
     }
-    .botton{
+    .botton {
         display: none;
     }
-    .menu_image{
+    .menu_image {
         display: block;
     }
-    .Menu-option-image{
+    .Menu-option-image {
         width: 35px;
         height: 35px;
     }

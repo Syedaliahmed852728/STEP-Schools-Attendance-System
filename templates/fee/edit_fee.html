@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fee/edit_fee.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
+    <title>Edit FEE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+        <header class="header">
+        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
+        <nav>
+            <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+            <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
+            <a class="top_menu" href="../classes/class_manage.html">Classes</a>
+            <a class="top_menu" href="../Attendance/attendance_index.html">Attendance</a>
+            <a class="top_menu" href="{{ url_for('fee_management') }}">Fee</a>
+            <a class="top_menu" href="../history/history.html">History</a>
+        </nav>
+        <div class="title">
+            <h1 id="title_name_heading">STEP Schools</h1>
+            <p id="title_name_city">Talagang</p>
+            
+        </div>
+
+        <div class="menu_image">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
+        </div>
+    
+    </header>
+    <section class="main_Container">
+       <div class="main_heading" >
+        <h1 class="static_txt">Student</h1>
+        <h1 class="dynamic_txt">FEE Management</h1>
+       </div>
+    </section>
+
+    
+ 
+    
+    <div class="container">
+        <header>
+        </header>
+        
+        <section class="details_container">
+            <div class="fixed_details">
+                <h3 class="stud_name">{{ student.stud_name }}</h3>
+                <p class="stud_reg">{{ student.stud_id }}</p>
+            </div>
+            
+            <div class="fixed_details">
+                <h3 class="stud_session">Session</h3>
+                <p class="stud_session_name">{{ student.stud_class_session }}</p>
+            </div>
+            
+            <a class="close_btn" href="{{ url_for('fee_management') }}">
+                <span class="cross-icon">×</span>
+            </a>
+        </section>
+
+        <div class="tab-section">
+            <div class="section-title">
+                <h2>Fee Records</h2>
+            </div>
+
+            <div class="tab-current-class">
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>Challan No.</th>
+                            <th>Paid Date</th>
+                            <th>Status</th>
+                            <th>Month</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td>{{ record.challan_no or '-' }}</td>
+                            <td>{{ record.paid_data or '-' }}</td>
+                            <td>{{ record.status }}</td>
+                            <td>{{ record.month_name }}</td>
+                            <td>{{ record.amount or '-' }}</td>
+                            <td>
+                                <!-- Update button opens form -->
+                                <button class="btn btn-update" data-fee-id="{{ record.fee_id }}"
+                                        data-challan="{{ record.challan_no }}"
+                                        data-date="{{ record.paid_data }}"
+                                        data-amount="{{ record.amount }}">
+                                    Update
+                                </button>
+                                <!-- Delete form -->
+                                <form action="{{ url_for('fee_delete', fee_id=record.fee_id) }}" method="post" style="display:inline;" onsubmit="return confirm('Delete this record?');">
+                                    <button type="submit" class="btn btn-delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6">No fee records found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Hidden Update Form -->
+            <div id="updateForm" style="display:none;">
+                <h3 class="form-title">Update Fee Record</h3>
+                <form id="feeForm" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="challanNo">Challan Number</label>
+                            <input type="text" id="challanNo" name="challan_no" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paidDate">Paid Date</label>
+                            <input type="date" id="paidDate" name="paid_date" value="{{ current_date }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="feeAmount">Amount</label>
+                            <input type="number" id="feeAmount" name="amount" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="feeStatus">Status</label>
+                            <select id="feeStatus" name="status">
+                                <option value="Unpaid">Unpaid</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Overdue">Overdue</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" id="cancelUpdate">Cancel</button>
+                        <button type="button" class="btn btn-update-confirm" id="confirmUpdate">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const updateButtons = document.querySelectorAll('.btn-update');
+        const updateForm    = document.getElementById('updateForm');
+        const feeForm       = document.getElementById('feeForm');
+        const cancelUpdate  = document.getElementById('cancelUpdate');
+        const confirmUpdate = document.getElementById('confirmUpdate');
+        let currentFeeId;
+
+        updateButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentFeeId = btn.dataset.feeId;
+                // populate form
+                document.getElementById('challanNo').value = btn.dataset.challan || '';
+                document.getElementById('paidDate').value  = btn.dataset.date    || '{{ current_date }}';
+                document.getElementById('feeAmount').value = btn.dataset.amount  || '';
+                document.getElementById('feeStatus').value = document.getElementById('feeStatus').querySelector(`option[value="${btn.parentElement.parentElement.children[2].innerText}"]`)?.value || 'Unpaid';
+
+                // set action URL
+                feeForm.action = `{{ url_for('fee_update', fee_id='') }}` + currentFeeId + `?stud_id={{ stud_id }}`;
+                updateForm.style.display = 'block';
+            });
+        });
+
+        cancelUpdate.addEventListener('click', () => {
+            updateForm.style.display = 'none';
+        });
+
+        confirmUpdate.addEventListener('click', () => {
+            // submit the form
+            feeForm.submit();
+        });
+    </script>
+</body>
+</html>

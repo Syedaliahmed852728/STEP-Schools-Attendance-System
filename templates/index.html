@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STEP Schools Talagang</title>
-    <link rel="shortcut icon" href="web_images/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 </head>
 <body>
     <header class="header">
-        <img id="logo_img"  src="web_images/logo.png" alt="Logo">
+        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
         <nav>
-            <a class="top_menu" href="index.html">Home</a>
-            <a class="top_menu" href="student/student_index.html">Students</a>
+            <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+            <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
             <a class="top_menu" href="classes/class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="Attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="fee/fee_management.html">Fee</a>
+            <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
+            <a class="top_menu" href="{{ url_for('fee_management') }}">Fee</a>
             <a class="top_menu" href="history/history.html">History</a>
         </nav>
         <div class="title">
@@ -28,7 +28,7 @@
         </div>
 
         <div class="menu_image">
-        <img class="Menu-option-image"  src="web_images/menu.png" alt="Menu-option">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
         </div>
     
     </header>
@@ -49,26 +49,26 @@
             </div>
         </div>
         <div class="right_section">
-            <img id="background_img-content" src="web_images/background.png" alt="background">
+            <img id="background_img-content" src="{{ url_for('static', filename='web_images/background.png') }}" alt="background">
         </div>
     </main>
     <section class="top_company">
         <h1 id="top_company_heading">Trusted By The Best</h1>
         <div class="companies">
             <div class="company">
-                <img class="company_img" src="web_images/step.png" alt="STEP School">
+                <img class="company_img" src="{{ url_for('static', filename='web_images/step.png') }}" alt="STEP School">
                 <h3 class="company_heading">STEP Schools</h3>
             </div>
             <div class="company">
-                <img class="company_img" src="web_images/ucp.png" alt="UCP">
+                <img class="company_img" src="{{ url_for('static', filename='web_images/ucp.png') }}" alt="UCP">
                 <h3 class="company_heading">UCP</h3>
             </div>
             <div class="company">
-                <img class="company_img" src="web_images/alied.png" alt="Allied School">
+                <img class="company_img" src="{{ url_for('static', filename='web_images/alied.png') }}" alt="Allied School">
                 <h3 class="company_heading">Allied School</h3>
             </div>
             <div class="company">
-                <img class="company_img" src="web_images/pgc.png" alt="Punjab Groups of Colleges">
+                <img class="company_img" src="{{ url_for('static', filename='web_images/pgc.png') }}" alt="Punjab Groups of Colleges">
                 <h3 class="company_heading">Punjab Colleges </h3>
             </div>
         </div>
@@ -83,7 +83,7 @@
     </div>
 
     <section class="grid_cards">
-        <a href="student/student_index.html" class="glass_card" id="card-1">
+        <a href="{{ url_for('home') }}" class="glass_card" id="card-1">
             <span class="card_emoji">👨‍🎓</span>
             <h4 class="card_heading">Student Management</h4>
             <p class="card_para">Add, update, and remove students efficiently. Organized student data at your fingertips.</p>
@@ -136,8 +136,8 @@
         <!-- get news update section -->
     
     <section class="get_update">
-        <div class="get_news_img">
-            <img class="new_img" src="web_images/news.jpeg" alt="news">
+        <div class="get_news_img">{{ url_for('static', filename='web_images/news.png') }}
+            <img class="new_img" src="{{ url_for('static', filename='web_images/news.png') }}" alt="news">
         </div>
         <div class="get_news_email">
             <h1 class="news_heading"> Get the latest updates</h1>

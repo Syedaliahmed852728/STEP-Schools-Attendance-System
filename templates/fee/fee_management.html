@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fee/fee_management.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
+    <title>FEE Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for certain components like modals, dropdowns) -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+        <header class="header">
+        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
+        <nav>
+            <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+            <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
+            <!-- Adjust other links to use url_for or correct static paths -->
+            <a class="top_menu" href="../../templates/classes/class_manage.html">Classes</a>
+            <a class="top_menu" target="_blank" href="../../templates/attendance/attendance_index.html">Attendance</a>
+            <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
+            <a class="top_menu" href="../../templates/history/history.html">History</a>
+        </nav>
+        <div class="title">
+            <h1 id="title_name_heading">STEP Schools</h1>
+            <p id="title_name_city">Talagang</p>
+            
+        </div>
+
+        <div class="menu_image">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
+        </div>
+    
+    </header>
+    <!-- edit fee details -->
+     <section class="main_Container">
+       <div class="main_heading" >
+        <h1 class="static_txt">Student </h1>
+        <h1 class="dynamic_txt">FEE Management</h1>
+       </div>
+    </section>
+
+  <!-- filters and search bar -->
+<section class="common_background filter_search_background">
+  <form method="GET" action="{{ url_for('fee_management') }}"
+        class="d-flex flex-wrap align-items-center gap-3 p-3">
+
+    <!-- Class filter -->
+    <div class="class_section_filter_headings">
+      <label class="filters_headings" for="class_selection">Class:</label>
+      <select name="class_name" id="class_selection">
+        <option value="" {% if not selected_class_name %}selected{% endif %}>All Classes</option>
+        {% for cname in class_names %}
+          <option value="{{ cname }}" {% if cname == selected_class_name %}selected{% endif %}>
+            {{ cname }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Section filter -->
+    <div class="class_section_filter_headings">
+      <label class="filters_headings" for="section_selection">Section:</label>
+      <select name="section" id="section_selection">
+        <option value="" {% if not selected_section %}selected{% endif %}>All Sections</option>
+        {% for sec in sections %}
+          <option value="{{ sec }}" {% if sec == selected_section %}selected{% endif %}>
+            {{ sec or 'NONE' }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status filter -->
+    <div class="class_section_filter_headings">
+      <label class="filters_headings" for="status_selection">Status:</label>
+      <select name="status" id="status_selection">
+        <option value="" {% if not selected_status %}selected{% endif %}>All Status</option>
+        {% for st in statuses %}
+          <option value="{{ st }}" {% if st == selected_status %}selected{% endif %}>
+            {{ st }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Search box -->
+    <div class="search-wrapper">
+      <input
+        type="text"
+        name="search_id"
+        class="search-input"
+        placeholder="Search by ID..."
+        value="{{ search_id }}">
+      <button type="submit" class="search-button" aria-label="Search">
+        🔍
+      </button>
+    </div>
+
+  </form>
+</section>  
+
+
+<!-- now displaying data of students according to filter and search -->
+<section class="common_background record_founded_background">
+  <table class="table_founded_student">
+    <thead>
+      <tr class="student_header">
+        <th class="student_data">ID</th>
+        <th class="student_data">Name</th>
+        <th class="student_data">Class</th>
+        <th class="student_data">Section</th>
+        <th class="student_data">Session</th>
+        <th class="student_data">Fee Status</th>
+        <th class="student_data">Action</th>
+      </tr>
+    </thead>
+    <tbody class="table_body">
+      {% if students %}
+        {% for s in students %}
+          <tr class="table_body_row">
+            <td class="table_body_data">{{ s.stud_id }}</td>
+            <td class="table_body_data">{{ s.stud_name }}</td>
+            <td class="table_body_data">
+              <span class="badge bg-primary">
+                {{ s.stud_class_name or '—' }}
+              </span>
+            </td>
+            <td class="table_body_data">
+              <span class="badge bg-info">
+                {{ s.stud_class_section or 'NONE' }}
+              </span>
+            </td>
+            <td class="table_body_data">
+              {{ s.stud_class_session or '—' }}
+            </td>
+            <td class="table_body_data">
+              {% if s.stud_fee_status %}
+                <span
+                  class="badge
+                    {% if s.stud_fee_status == 'Paid' %}bg-success{% endif %}
+                    {% if s.stud_fee_status == 'Unpaid' %}bg-warning text-dark{% endif %}
+                    {% if s.stud_fee_status == 'Overdue' %}bg-danger{% endif %}
+                  ">
+                  {{ s.stud_fee_status }}
+                </span>
+              {% else %}
+                <span class="badge bg-secondary">No Record</span>
+              {% endif %}
+            </td>
+            <td class="view_btn">
+              <div class="view_action-buttons">
+                <a href="{{ url_for('edit_fee', stud_id=s.stud_id) }}"
+                class="view_btn_design">
+                  EDIT
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="7" class="text-center py-4">
+            No students found for the selected filters.
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</section>
+
+ 
+    

@@ -2,6 +2,7 @@ import sqlite3
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+from config import Config
 
 load_dotenv()
 
@@ -42,7 +43,6 @@ SCHEMAS = {
             CREATE TABLE IF NOT EXISTS student_table (
                 stud_id TEXT PRIMARY KEY,
                 stud_name TEXT NOT NULL,
-                stud_section TEXT,
                 class_id TEXT,
                 parent_id TEXT,
                 FOREIGN KEY (class_id)   REFERENCES class_table(class_id),
@@ -52,7 +52,6 @@ SCHEMAS = {
         "columns": {
             "stud_id":      "TEXT PRIMARY KEY",
             "stud_name":    "TEXT NOT NULL",
-            "stud_section": "TEXT",
             "class_id":     "TEXT",
             "parent_id":    "TEXT"
         }
@@ -61,19 +60,43 @@ SCHEMAS = {
         "create_sql": """
             CREATE TABLE IF NOT EXISTS fee_table (
                 fee_id TEXT PRIMARY KEY,
+                challan_no TEXT,
                 paid_data TEXT,
                 month_name TEXT,
-                status TEXT NOT NULL,
+                status TEXT,
+                amount TEXT,
                 stud_id TEXT,
                 FOREIGN KEY (stud_id) REFERENCES student_table(stud_id)
             );
         """,
         "columns": {
             "fee_id":     "TEXT PRIMARY KEY",
+            "challan_no": "TEXT",
             "paid_data":  "TEXT",
             "month_name": "TEXT",
-            "status":     "TEXT NOT NULL",
+            "status":     "TEXT",
+            "amount":     "TEXT",
             "stud_id":    "TEXT"
+        }
+    },
+
+    "attendance_table": {
+        "create_sql": """
+            CREATE TABLE IF NOT EXISTS attendance_table (
+                stud_id TEXT,
+                date_full TEXT,
+                arrival_time TEXT,
+                departure_time TEXT,
+                status TEXT CHECK(status IN ('Present', 'Absent', 'Off')),
+                FOREIGN KEY (stud_id) REFERENCES student_table(stud_id)
+            );
+        """,
+        "columns": {
+            "stud_id":        "TEXT",
+            "date_full":      "TEXT",
+            "arrival_time":   "TEXT",
+            "departure_time": "TEXT",
+            "status":         "TEXT CHECK(status IN ('Present', 'Absent', 'Off'))"
         }
     }
 }
@@ -114,11 +137,15 @@ def database_creation(full_db_path: str, schemas: dict):
         print("database operation failed:", e)
 
 
-# db_path = os.getenv("DB_PATH") 
-# db_name = os.getenv("DB_NAME")     
+db_path = Config.STORAGE_PATH
 
-# # chking if the database exists or not
-# Path(db_path).mkdir(parents=True, exist_ok=True)
-# full_db_path = os.path.join(db_path, f"{db_name}.sqlite3")
+# chking if the database exists or not
+Path(db_path).mkdir(parents=True, exist_ok=True)
+full_db_path = Config.DB
+full_mark_left_db_path = Config.LEFT_DB
 
-# database_creation(full_db_path=full_db_path, schemas=SCHEMAS)
+database_creation(full_db_path=full_db_path, schemas=SCHEMAS)
+
+database_creation(full_db_path=full_mark_left_db_path, schemas=SCHEMAS)
+
+

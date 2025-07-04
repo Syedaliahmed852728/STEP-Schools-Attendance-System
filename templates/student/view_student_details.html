@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="view_stud_detail_style.css">
-    <link rel="shortcut icon" href="../web_images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='student/view_stud_detail_style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
     <title>view student details</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,10 +15,10 @@
 </head>
 <body>
         <header class="header">
-        <img id="logo_img"  src="../web_images/logo.png" alt="Logo">
+        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
         <nav>
-            <a class="top_menu" href="../index.html">Home</a>
-            <a class="top_menu" href="student_index.html">Students</a>
+            <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+            <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
             <a class="top_menu" href="../classes/class_manage.html">Classes</a>
             <a class="top_menu" target="_blank" href="../Attendance/attendance_index.html">Attendance</a>
             <a class="top_menu" href="../fee/fee_management.html">Fee</a>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="menu_image">
-        <img class="Menu-option-image"  src="../web_images/menu.png" alt="Menu-option">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
         </div>
     
     </header>
@@ -43,25 +43,25 @@
     </section>
     <menu class="Stud_menu">
      
-        <a href="add_new student.html" class="menu_desig">
-        <img class="icon_menu"  src="../web_images/add.png" alt="Add Student">
+        <a href="{{ url_for('add_student') }}" class="menu_desig">
+        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/add.png') }}" alt="Add Student">
         <span class="text_menu">Add Student</span>
         </a>
      
         <a href="Search_update_student.html" class="menu_desig">
-        <img class="icon_menu"  src="../web_images/update.png" alt="update Student">
+        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/update.png') }}" alt="update Student">
         <span class="text_menu">Update Student</span>
         </a>
 
          <a href="delete_student.html" class="menu_desig">
-        <img class="icon_menu"  src="../web_images/delete.png" alt="Delete Student">
+        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/delete.png') }}" alt="Delete Student">
         <span class="text_menu">Delete Student</span>
         </a>
     </menu>
     <div class="container position-relative">
     <!-- Animated Header with Close Button -->
     <div class="header-wrapper text-center mb-5">
-        <a href="student_index.html" 
+        <a href="{{ url_for('student_index') }}" 
            class="close-btn hover-grow" 
            aria-label="Close dashboard">
             <span class="cross-icon">x</span>
@@ -84,8 +84,8 @@
                 <!-- Profile Info Section -->
                 <div class="col-md-4 text-center profile-section">
                     <div class="info-container">
-                        <h3 class="profile-name">Abuzar Hassan</h3>
-                        <div class="student-id">ID: FY1001</div>
+                        <h3 class="profile-name">{{ student.stud_name }}</h3>
+                        <div class="student-id">{{ student.stud_id }}</div>
                         <div class="status-badge {% if student.left_status %}left-status{% else %}active-status{% endif %}" role="status">
                             <!-- {{ 'Left' if student.left_status else 'Active' }} -->
                               <!-- for now i m writing status active -->
@@ -99,7 +99,7 @@
                                 <!-- {{ student.image_path or 'No image available' }} -->
                                   <!-- here to display both image path and if not then display no avalible image -->
                                    <!-- for now i m writing no image -->
-                                    NO image avalible
+                                    No Available path
                             </div>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                                 <div class="detail-card">
                                     <label class="detail-label">📅 FEE Status</label>
                                     <!-- display current month fee status -->
-                                    <p class="detail-value">Pending</p>
+                                    <p class="detail-value">{{ student.stud_fee_status }}</p>
                                 </div>
                                 <div class="detail-card">
                                 <a href="#feeModal" class="clickable-card">
@@ -204,12 +204,17 @@
                                 <div class="detail-card">
                                     <label class="detail-label">🏫 Current Class</label>
                                     <!-- logic to display that class -->
-                                    <p class="detail-value">Foundation 1</p>
+                                    <p class="detail-value">{{ student.stud_class_name }}</p>
                                 </div>
                                 <div class="detail-card">
                                     <label class="detail-label">📚 Section</label>
                                     <!-- logic student section and lets say no section is selected then display 'none'-->
-                                    <p class="detail-value">None</p>
+                                    <p class="detail-value">{{ student.stud_class_section or 'None' }}</p>
+                                </div>
+                                <div class="detail-card">
+                                    <label class="detail-label">📚 Session</label>
+                                    <!-- logic student section and lets say no section is selected then display 'none'-->
+                                    <p class="detail-value">{{ student.stud_class_session}}</p>
                                 </div>
                             </div>
                         </div>
@@ -246,15 +251,15 @@
     <div class="detail-card elevated-card p-3">
         <div class="guardian-name mb-2">
             <i class="bi bi-person-badge-fill me-2"></i>
-            Arshad Mehmood Akhter Malik
+            {{ student.stud_parent_name }}
         </div>
         <div class="guardian-contact mb-2">
             <i class="bi bi-telephone-fill me-2"></i>
-            03249575015
+            {{ student.stud_parent_contact_number }}
         </div>
         <div class="guardian-cnic">
             <i class="bi bi-credit-card-2-front-fill me-2"></i>
-            3720383988361
+            {{ student.stud_parent_id }}
         </div>
     </div>
 </div>

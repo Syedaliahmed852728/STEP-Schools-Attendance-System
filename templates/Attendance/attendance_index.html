@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Attendance</title>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='Attendance/attendance_style.css') }}">
+</head>
+<body>
+  <header class="header">
+    <!-- (your logo/nav/title markup here) -->
+  </header>
+
+  <section class="attendance_bg">
+    <img src="{{ url_for('static', filename='web_images/bg.png') }}"
+         class="bg_image" alt="Background">
+
+    <img src="{{ url_for('video_feed') }}"
+         class="camera_overlay" alt="Live camera">
+
+    <img id="mode_img"
+         src="{{ url_for('static', filename='web_images/mode0.png') }}"
+         class="mode_overlay" alt="Mode">
+
+    <div class="bg_btn">
+      <button id="bg_btn">Start</button>
+    </div>
+  </section>
+
+  <section class="attendance_info">
+    <h1 class="info_heading">
+      Face Recognition Attendance System
+    </h1>
+    <p class="info_para">
+      Real‑time check‑in/out with logging and database updates.
+    </p>
+  </section>
+
+  <script>
+    const btn     = document.getElementById('bg_btn');
+    const modeImg = document.getElementById('mode_img');
+    let modeSrc   = null;
+
+    function startModeStream() {
+      if (modeSrc) return;
+      modeSrc = new EventSource('/attendance/mode_feed');
+      modeSrc.onmessage = e => {
+        console.log('[SSE] mode →', e.data);
+        modeImg.src = `/static/web_images/${e.data}.png`;
+      };
+      modeSrc.onerror = err => {
+        console.error('[SSE] error', err);
+        modeSrc.close();
+        modeSrc = null;
+      };
+    }
+
+    btn.addEventListener('click', () => {
+      if (btn.textContent === 'Start') {
+        btn.disabled = true;
+        fetch('/attendance/start')
+          .then(() => {
+            btn.textContent = 'Stop';
+            startModeStream();
+          })
+          .catch(console.error)
+          .finally(() => btn.disabled = false);
+      } else {
+        fetch('/attendance/stop')
+          .then(resp => resp.text())
+          .then(txt => {
+            console.log(txt);
+            btn.textContent = 'Start';
+            if (modeSrc) { modeSrc.close(); modeSrc = null; }
+            modeImg.src = '/static/web_images/mode0.png';
+          })
+          .catch(console.error);
+      }
+    });
+  </script>
+</body>
+</html>
