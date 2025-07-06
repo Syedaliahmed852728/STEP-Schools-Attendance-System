@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, abort, Response, stream_with_context
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, Response, stream_with_context, send_file
 from utils import with_sql_cursor
 from datetime import date
 from core.student_services import add_the_new_student, get_student,prepare_student_index_data, update_the_student, permanent_delete_student, mark_left_student
@@ -25,7 +25,9 @@ from core.attendance_services import (
     generate_mjpeg_frame,
     generate_mode_events,
 )
+import pandas as pd
 
+from core.class_services import prepare_class_index_data, prepare_view_class_details_data
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -313,15 +315,18 @@ def fee_delete(fee_id):
 def attendance():
     return render_template("attendance/attendance_index.html")
 
+
 @app.route("/attendance/start")
 def attendance_start():
     started = start_attendance_loop()
     return ("Attendance started" if started else "Already running"), 200
 
+
 @app.route("/attendance/stop")
 def attendance_stop():
     stopped = stop_attendance_loop()
     return ("Attendance stopped" if stopped else "Not running"), 200
+
 
 @app.route("/attendance/video_feed")
 def video_feed():
@@ -329,6 +334,7 @@ def video_feed():
         generate_mjpeg_frame(),
         mimetype='multipart/x-mixed-replace; boundary=frame'
     )
+
 
 @app.route("/attendance/mode_feed")
 def mode_feed():
@@ -338,6 +344,63 @@ def mode_feed():
     )
 
 
+@app.route("/classes", methods=["GET"])
+def class_index():
+    data = prepare_class_index_data(with_sql_cursor, request.args)
+    return render_template("classes/class_manage.html", **data)
+
+
+@app.route("/classes/<class_id>", methods=["GET"])
+def view_class_details(class_id):
+    data = prepare_view_class_details_data(with_sql_cursor, class_id)
+    return render_template("classes/view_class_details.html", **data)
+
+@app.route("/classes/<class_id>/export", methods=["GET"])
+def export_class(class_id):
+    # 1) Build all of the data (just like view_class_details)
+    data = prepare_view_class_details_data(with_sql_cursor, class_id)
+    if not data.get("class"):
+        abort(404)
+
+    students = data["students_overview"]
+
+    # 2) Optionally filter for current month only
+    option = request.args.get("export_option", "current_month")
+    if option == "current_month":
+        # keep only students whose fee_status is for current_month,
+        # but since students_overview already has only this month’s fee,
+        # we just export the full overview table.
+        pass
+    # if option == "all", you could fetch historical data here
+
+    # 3) Convert to DataFrame
+    df = pd.DataFrame(students)
+    # rename columns for nicer Excel headings
+    df = df.rename(columns={
+        "stud_id": "Student ID",
+        "stud_name": "Name",
+        "attendance_pct": "Attendance %",
+        "present_count": "Present",
+        "absent_count": "Absent",
+        "fee_status": "Fee Status"
+    })
+
+    # 4) Write into an in-memory Excel file
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer,
+                    sheet_name="Overview",
+                    index=False)
+    output.seek(0)
+
+    # 5) Send it back as an attachment
+    filename = f"{class_id}.xlsx"
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)

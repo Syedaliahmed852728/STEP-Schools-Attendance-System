@@ -54,15 +54,21 @@
   </menu>
 
   <div class="container mt-5">
-    <div class="card p-4 shadow glass animate__animated animate__fadeIn position-relative">
+    <div class="card p-4 shadow glass position-relative animate__animated animate__fadeIn">
       <a href="{{ url_for('student_index') }}" class="btn-close custom-close position-absolute top-0 end-0 m-3"></a>
       <h2 class="text-center mb-4 text-gradient fw-bold">Delete Students Data</h2>
 
-      <section class="common_background filter_search_background mb-4">
-        <form method="GET" action="{{ url_for('delete_student') }}" class="d-flex flex-wrap align-items-center gap-3">
+      <!-- Filters + Search -->
+      <section class="common_background">
+        <form
+          method="GET"
+          action="{{ url_for('delete_student') }}"
+          class="filter_search_background d-flex flex-wrap align-items-center justify-content-around gap-3"
+        >
+          <!-- Class Filter -->
           <div class="class_section_filter_headings">
             <h1 class="filters_headings">Class:</h1>
-            <select name="class_name" class="form-select">
+            <select id="class_selection" name="class_name">
               <option value=""></option>
               <option value="" {% if not selected_class_name %}selected{% endif %}>All Classes</option>
               {% for cname in class_names %}
@@ -70,9 +76,11 @@
               {% endfor %}
             </select>
           </div>
+
+          <!-- Section Filter -->
           <div class="class_section_filter_headings">
             <h1 class="filters_headings">Section:</h1>
-            <select name="section" class="form-select">
+            <select id="section_selection" name="section">
               <option value=""></option>
               <option value="" {% if not selected_section %}selected{% endif %}>All Sections</option>
               {% for sec in sections %}
@@ -80,15 +88,29 @@
               {% endfor %}
             </select>
           </div>
-          <div class="search_headings">
-            <div class="search-wrapper">
-              <input type="text" name="search_id" class="form-control" placeholder="Search by ID..." value="{{ search_id }}">
-              <button type="submit" class="btn btn-outline-secondary btn-sm">🔍</button>
-            </div>
+
+          <!-- Search Box -->
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="search_input"
+              name="search_id"
+              class="search-input"
+              placeholder="Search..."
+              value="{{ search_id }}"
+            />
+            <button class="search-button" type="submit" aria-label="Search">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none"
+                   xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
           </div>
         </form>
       </section>
 
+      <!-- Records Table -->
       <section class="common_background record_founded_background">
         <table class="table table-striped">
           <thead>
@@ -99,28 +121,28 @@
           <tbody>
             {% if students %}
               {% for s in students %}
-              <tr>
-                <td>{{ s.stud_id }}</td>
-                <td>{{ s.stud_name }}</td>
-                <td><span class="badge bg-primary">{{ s.stud_class_name or '—' }}</span></td>
-                <td><span class="badge bg-info">{{ s.stud_class_section or 'NONE' }}</span></td>
-                <td>{{ s.stud_class_session or '—' }}</td>
-                <td><span class="badge bg-primary">{{ s.stud_fee_status or '—' }}</span></td>
-                <td class="position-relative">
-                  <button type="button" class="btn btn-sm btn-danger showOptionsBtn">DELETE</button>
-                  <div class="del_btn_option bg-light p-3 shadow position-fixed top-50 start-50 translate-middle d-none" style="z-index: 1050;">
-                    <h5 class="text-danger">WARNING!</h5>
-                    <p>"Delete Permanently" is irreversible.</p>
-                    <p>"Mark as Left" moves the student to archive.</p>
-                    <form method="POST" action="{{ url_for('delete_student', student_id=s.stud_id) }}">
-                      <div class="d-flex gap-2">
-                        <button type="submit" name="action" value="delete" class="btn btn-outline-danger btn-sm">DELETE PERMANENTLY</button>
-                        <button type="submit" name="action" value="left" class="btn btn-outline-primary btn-sm">MARK AS LEFT</button>
-                      </div>
-                    </form>
-                  </div>
-                </td>
-              </tr>
+                <tr>
+                  <td>{{ s.stud_id }}</td>
+                  <td>{{ s.stud_name }}</td>
+                  <td><span class="badge bg-primary">{{ s.stud_class_name or '—' }}</span></td>
+                  <td><span class="badge bg-info">{{ s.stud_class_section or 'NONE' }}</span></td>
+                  <td>{{ s.stud_class_session or '—' }}</td>
+                  <td><span class="badge bg-primary">{{ s.stud_fee_status or '—' }}</span></td>
+                  <td class="position-relative">
+                    <button type="button" class="btn btn-sm btn-danger showOptionsBtn">DELETE</button>
+                    <div class="del_btn_option bg-light p-3 shadow position-fixed top-50 start-50 translate-middle d-none" style="z-index: 1050;">
+                      <h5 class="text-danger">WARNING!</h5>
+                      <p>"Delete Permanently" is irreversible.</p>
+                      <p>"Mark as Left" moves the student to archive.</p>
+                      <form method="POST" action="{{ url_for('delete_student', student_id=s.stud_id) }}">
+                        <div class="d-flex gap-2">
+                          <button type="submit" name="action" value="delete" class="btn btn-outline-danger btn-sm">DELETE PERMANENTLY</button>
+                          <button type="submit" name="action" value="left" class="btn btn-outline-primary btn-sm">MARK AS LEFT</button>
+                        </div>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
               {% endfor %}
             {% else %}
               <tr>

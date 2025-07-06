@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="view_class_details.css">
-    <link rel="shortcut icon" href="../web_images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='classes/view_class_details.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
     <title>view class details</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,14 +15,14 @@
 </head>
 <body>
         <header class="header">
-        <img id="logo_img"  src="../web_images/logo.png" alt="Logo">
+        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
         <nav>
-            <a class="top_menu" href="../index.html">Home</a>
-            <a class="top_menu" href="../student/student_index.html">Students</a>
-            <a class="top_menu" href="../classes/class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="../Attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="../fee/fee_management.html">Fee</a>
-            <a class="top_menu" href="../history/history.html">History</a>
+        <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+        <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
+        <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
+        <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
+        <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
+        <a class="top_menu" href="history/history.html">History</a>
         </nav>
         <div class="title">
             <h1 id="title_name_heading">STEP Schools</h1>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="menu_image">
-        <img class="Menu-option-image"  src="../web_images/menu.png" alt="Menu-option">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
         </div>
     
     </header>
@@ -39,7 +39,7 @@
     <div class="container position-relative">
     <!-- Animated Header with Close Button -->
     <div class="header-wrapper text-center mb-5">
-        <a href="class_manage.html" 
+        <a href="{{ url_for('class_index') }}" 
            class="close-btn hover-grow" 
            aria-label="Close dashboard">
             <span class="cross-icon">x</span>
@@ -60,24 +60,24 @@
                     <!-- Left Section: Class Summary -->
                     <div class="col-md-4 text-center profile-section">
                         <div class="info-container">
-                            <h3 class="profile-name">Foundation YEAR 1</h3>
-                            <div class="student-id">Class ID: FY1-2025</div>
+                            <h3 class="profile-name">{{ class.class_name }}</h3>
+                            <div class="student-id">{{ class.class_id }}</div>
                             <div class="status-badge active-status" role="status">Active</div>
                         </div>
 
                         <!-- Attendance Quick Stats -->
                         <div class="mt-4">
-                            <p>Total Students: <strong>25</strong></p>
+                            <p>Total Students: <strong>{{ total_students }}</strong></p>
                             <p>
                                 Present Today: 
                                 <strong>
-                                    <button class="btn btn-sm btn-outline-success" onclick="toggleSection('presentList')">22</button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="toggleSection('presentList')">{{ present_today|length }}</button>
                                 </strong>
                             </p>
                             <p>
                                 Absent Today: 
                                 <strong>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="toggleSection('absentList')">3</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="toggleSection('absentList')">{{ absent_today|length }}</button>
                                 </strong>
                             </p>
                         </div>
@@ -88,24 +88,24 @@
                             <hr class="my-4">
                         <!-- add backend code here so that specific class fee status will be shown  -->
                          <!-- that how many students are pending, paid and overdue-->
-                            <h4 class="section-title">💰 Fee Status</h4>
+                            <h4 class="section-title">💰 Fee Status ({{ current_month }})</h4>
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <div class="detail-card">
                                       <label>Paid</label>
-                                      <p class="text-success">15</p>
+                                      <p class="text-success">{{ fee_paid }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="detail-card">
                                         <label>Pending</label>
-                                        <p class="text-warning">7</p>
+                                        <p class="text-warning">{{ fee_pending }}</p>
                                     </div>
                                 </div> 
                                 <div class="col-md-4">
                                     <div class="detail-card">
                                         <label>Overdue</label>
-                                        <p class="text-danger">3</p>
+                                        <p class="text-danger">{{ fee_overdue }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -115,7 +115,7 @@
 
                 <!-- Hidden Present Students Box -->
                 <div id="presentList" class="mt-4 d-none">
-                    <h5 class="section-title">✅ Present Students (May 28, 2025)</h5>
+                    <h5 class="section-title">✅ Present Students ({{ today_date }})</h5>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
@@ -126,16 +126,13 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for s in present_today %}
                                 <tr>
-                                    <td>FY1020</td>
-                                    <td>Mariam Khan</td>
+                                    <td>{{ s.stud_id }}</td>
+                                    <td>{{ s.stud_name }}</td>
                                     <td class="text-success">Present</td>
                                 </tr>
-                                <!-- this all is dummy removed it -->
-                                <tr><td>FY1021</td><td>Hamza Ali</td><td class="text-success">Present</td></tr>
-                                <tr><td>FY1022</td><td>Ayesha Siddique</td><td class="text-success">Present</td></tr>
-                                <tr><td>FY1023</td><td>Omar Farooq</td><td class="text-success">Present</td></tr>
-                                <tr><td>FY1024</td><td>Zain Khan</td><td class="text-success">Present</td></tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -144,7 +141,7 @@
                 <!-- Hidden Absent Students Box -->
                 <div id="absentList" class="mt-4 d-none">
                     <!-- add current date backend code here -->
-                    <h5 class="section-title">❌ Absent Students (May 28, 2025)</h5>
+                    <h5 class="section-title">❌ Absent Students ({{ today_date }})</h5>
                     <div class="table-responsive">
                         <table class="table table-striped table-bordered">
                             <thead>
@@ -156,9 +153,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for s in absent_today %}
                                 <tr>
-                                    <td>FY1010</td>
-                                    <td>Usman Tariq</td>
+                                    <td>{{ s.stud_id }}</td>
+                                    <td>{{ s.stud_name }}</td>
                                     <td class="text-danger">Absent</td>
                                     <td>
                                         <!-- add backend code to send a msg to parent contact number -->
@@ -166,9 +164,7 @@
                                         <button class="btn btn-sm btn-outline-info">Notify Parent</button>
                                     </td>
                                 </tr>
-                                <!-- this is dummy data does'nt need more after backend and Database  -->
-                                <tr><td>FY1012</td><td>Hina Baloch</td><td class="text-danger">Absent</td><td><button class="btn btn-sm btn-outline-info">Notify Parent</button></td></tr>
-                                <tr><td>FY1025</td><td>Raza Ahmed</td><td class="text-danger">Absent</td><td><button class="btn btn-sm btn-outline-info">Notify Parent</button></td></tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -192,93 +188,80 @@
                         <tbody>
                             <!-- Student Row Example -->
                              <!-- add here proper backend code to show actual data of student  -->
-                            <tr>
+                            {% for s in students_overview %}
+                             <tr>
                         
-                                <td>FY1001</td>
+                                <td>{{ s.stud_id }}</td>
                                 <!-- as user click to student name then it will goes to that student details -->
                                  <!-- add here backend code  -->
-                                <td><a href="../student/view_Student_details.html" class="text-primary fw-bold">Ali Raza</a></td>
-                                <td>95%</td>
-                                <td>19</td>
-                                <td>1</td>
-                                <td><span class="badge bg-success">Paid</span></td>
+                                <td><a href="{{ url_for('view_student_details', student_id=s.stud_id) }}" class="text-primary fw-bold">{{ s.stud_name }}</a></td>
+                                <td>{{ "%.0f"|format(s.attendance_pct) }}%</td>
+                                <td>{{ s.present_count }}</td>
+                                <td>{{ s.absent_count }}</td>
+                                <td>
+                                    <span
+                                        class="badge {% if s.fee_status=='Paid' %}bg-success{% elif s.fee_status=='Overdue' %}bg-danger{% else %}bg-warning{% endif %}"
+                                        >{{ s.fee_status }}</span
+                                    >     
                                 <!-- here make sure that as button(delete or edit) will click then that student info will be show 
                                  when page will be open -->
                                 <td>
-                                    <a href="../student/update_student.html">
+                                    <a href="{{ url_for('update_student', student_id=s.stud_id) }}">
                                         <button class="btn btn-sm btn-outline-info me-1">Edit</button>
                                     </a>
-                                    <a href="../student/delete_student.html">
+                                    <a href="{{ url_for('delete_student', student_id=s.stud_id) }}">
                                     <button class="btn btn-sm btn-outline-danger">Delete</button>
                                     </a>
                                 </td>
                             
                             </tr>
-                            <!-- dummy data remove it until <tbody>  -->
-                            <!-- <tr>
-                                <td>FY1002</td>
-                                <td><a href="#" class="text-primary fw-bold">Sara Khan</a></td>
-                                <td>100%</td>
-                                <td>20</td>
-                                <td>0</td>
-                                <td><span class="badge bg-success">Paid</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info me-1">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr> -->
-                            <tr>
-                                <td>FY1010</td>
-                                <td><a href="#" class="text-primary fw-bold">Usman Tariq</a></td>
-                                <td>65%</td>
-                                <td>13</td>
-                                <td>7</td>
-                                <td><span class="badge bg-warning">Pending</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info me-1">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>FY1012</td>
-                                <td><a href="#" class="text-primary fw-bold">Hina Baloch</a></td>
-                                <td>70%</td>
-                                <td>14</td>
-                                <td>6</td>
-                                <td><span class="badge bg-danger">Overdue</span></td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info me-1">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Export Section -->
-                <div class="export-section mt-4">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-8">
-                            <label class="form-label">Export Options:</label>
-                            <!-- when this selected then make sure that display complete 
-                             data with current month fee status  -->
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="export_option" value="all" id="exportAll">
-                                <label class="form-check-label" for="exportAll">Complete Class History</label>
-                            </div>
-                            <!-- similary just for current month data -->
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="export_option" value="current_month" id="exportMonth" checked>
-                                <label class="form-check-label" for="exportMonth">Current Month Only</label>
-                            </div>
-                        </div>
-                        <!-- make sure while exporting month then export only that month details -->
-                         <!-- while exporting complete history of class then include each month -->
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-gradient">📥 Export Report</button>
-                        </div>
+                <form
+                method="GET"
+                action="{{ url_for('export_class', class_id=class.class_id) }}"
+                class="export-section mt-4"
+                >
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-8">
+                    <label class="form-label">Export Options:</label>
+                    <div class="form-check form-check-inline">
+                        <input
+                        class="form-check-input"
+                        type="radio"
+                        name="export_option"
+                        value="all"
+                        id="exportAll"
+                        />
+                        <label class="form-check-label" for="exportAll">
+                        Complete Class History
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input
+                        class="form-check-input"
+                        type="radio"
+                        name="export_option"
+                        value="current_month"
+                        id="exportMonth"
+                        checked
+                        />
+                        <label class="form-check-label" for="exportMonth">
+                        Current Month Only
+                        </label>
+                    </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                    <button type="submit" class="btn btn-gradient">
+                        📥 Export Report
+                    </button>
                     </div>
                 </div>
+                </form>
 
                 <!-- Promotion Button -->
                 <div class="text-center mt-4">

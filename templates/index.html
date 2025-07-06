@@ -16,7 +16,7 @@
         <nav>
             <a class="top_menu" href="{{ url_for('home') }}">Home</a>
             <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
-            <a class="top_menu" href="classes/class_manage.html">Classes</a>
+            <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
             <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
             <a class="top_menu" href="{{ url_for('fee_management') }}">Fee</a>
             <a class="top_menu" href="history/history.html">History</a>
@@ -89,13 +89,13 @@
             <p class="card_para">Add, update, and remove students efficiently. Organized student data at your fingertips.</p>
         </a>
         
-        <a href="classes/class_manage.html" class="glass_card" id="card-2">
+        <a href="{{ url_for('class_index') }}" class="glass_card" id="card-2">
             <span class="card_emoji">🏫</span>
             <h4 class="card_heading">Class Management</h4>
             <p class="card_para">Create, manage, and organize classes seamlessly with a smooth interface.</p>
         </a> 
         
-        <a href="Attendance/attendance_index.html" class="glass_card" id="card-3">
+        <a href="{{ url_for('attendance') }}" class="glass_card" id="card-3">
             <span class="card_emoji">📋</span>
             <h4 class="card_heading">Attendance Tracking</h4>
             <p class="card_para">Track attendance with real-time updates and insightful data views.</p>

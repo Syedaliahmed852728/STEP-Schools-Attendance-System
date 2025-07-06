@@ -1,157 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="class_manage.css">
-    <link rel="shortcut icon" href="../web_images/logo.png" type="image/x-icon">
-    <title>Class Management</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap JS (for certain components like modals, dropdowns) -->
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='classes/class_manage.css') }}" />
+  <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon" />
+  <title>Class Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-        <header class="header">
-        <img id="logo_img"  src="../web_images/logo.png" alt="Logo">
-        <nav>
-            <a class="top_menu" href="../index.html">Home</a>
-            <a class="top_menu" href="../student/student_index.html">Students</a>
-            <a class="top_menu" href="class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="../Attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="../fee/fee_management.html">FEE</a>
-            <a class="top_menu" href="../history/history.html">History</a>
-        </nav>
-        <div class="title">
-            <h1 id="title_name_heading">STEP Schools</h1>
-            <p id="title_name_city">Talagang</p>
-            
-        </div>
+  <header class="header">
+    <img id="logo_img" src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo" />
+    <nav>
+      <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+      <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
+      <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
+      <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
+      <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
+      <a class="top_menu" href="history/history.html">History</a>
+    </nav>
+    <div class="title">
+      <h1 id="title_name_heading">STEP Schools</h1>
+      <p id="title_name_city">Talagang</p>
+    </div>
+    <div class="menu_image">
+      <img class="Menu-option-image" src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu" />
+    </div>
+  </header>
 
-        <div class="menu_image">
-        <img class="Menu-option-image"  src="../web_images/menu.png" alt="Menu-option">
-        </div>
-    
-    </header>
-    <section class="main_Container">
-       <div class="main_heading" >
-        <h1 class="static_txt">Class</h1>
-        <h1 class="dynamic_txt">Management</h1>
-       </div>
-    </section>
+  <section class="main_Container">
+    <div class="main_heading">
+      <h1 class="static_txt">Class</h1>
+      <h1 class="dynamic_txt">Management</h1>
+    </div>
+  </section>
 
+  <!-- filters -->
+  <section class="common_background filter_search_background">
+    <form method="GET" action="{{ url_for('class_index') }}" class="d-flex flex-wrap align-items-center gap-3">
+      <!-- Class filter -->
+      <div class="class_section_filter_headings">
+        <h1 class="filters_headings">Class:</h1>
+        <select name="class_name" class="form-select">
+          <option value="" {% if not selected_class_name %}selected{% endif %}>All Classes</option>
+          {% for cname in class_names %}
+            <option value="{{ cname }}" {% if cname == selected_class_name %}selected{% endif %}>
+              {{ cname }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
+      <!-- Section filter -->
+      <div class="class_section_filter_headings">
+        <h1 class="filters_headings">Section:</h1>
+        <select name="section" class="form-select">
+          <option value="" {% if not selected_section %}selected{% endif %}>All Sections</option>
+          {% for sec in sections %}
+            <option value="{{ sec }}" {% if sec == selected_section %}selected{% endif %}>
+              {{ sec or 'NONE' }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-  <!-- filters and search bar -->
-<section class="common_background filter_search_background">
-  
-  <!-- class filter -->
-  <div class="class_section_filter_headings">
-  <h1 class="filters_headings">Class:</h1>
-  <select name="section" id="class_selection">
-    
-      <option value="option"> </option>
-      <option value="option0">All Classes </option>
-      <option value="option1">FOUNDATION YEAR 1</option>
-      <option value="option2">FOUNDATION YEAR 2</option>
-      <option value="option3">FOUNDATION YEAR 3</option>
-      <option value="option4">STEP 1</option>
-      <option value="option5">STEP 2</option>
-      <option value="option6">STEP 3</option>
-      <option value="option7">STEP 4</option>
-      <option value="option8">STEP 5</option>
-      <option value="option9">STEP 6</option>
-      <option value="option10">STEP 7</option>
-      <option value="option11">STEP 8</option>
-      <option value="option12">STEP 9</option>
-      <option value="option13">STEP 10</option>
-  </select>
-  </div>
-  <!-- section  filter-->
-  <div class="class_section_filter_headings">
-  <h1 class="filters_headings">Section:</h1>
-  <select name="section" id="section_selection">
-      
-      <option value="option"> </option>
-      <option value="option0">All Section </option>
-      <option value="option1">A</option>
-      <option value="option2">B</option>
-      <option value="option3">Girls</option>
-      <option value="option4">Boys</option>
-      <option value="option5">NONE</option>
-  </select>
-  </div>
-  
-  <!-- search  button -> stud_id: -->
-  <div class="search_headings">
-  <div class="search-wrapper">
-    <input type="text" class="search-input" placeholder="Search..." />
-    <button class="search-button">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-    </button>
-  </div>
-</div>
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+  </section>
 
-
-</section>   
-
-
-<!-- now displaying data of students according to filter and search -->
- <section class="common_background record_founded_background">
-  <table class="table_founded_student">
-    <thead>
-      <tr class="student_header">
-        <th class="student_data">Class-code</th>
-        <th class="student_data">Class</th>
-        <th class="student_data">Section</th>
-        <th class="student_data">Students</th>
-        <th class="student_data">Action</th>
-      </tr>
-    </thead>
-       <!-- here all filtered/searched classes result will be display -->
-       <!-- it is not realistic data but "VIEW DETAILS " is perfect button--> 
-      <tbody class="table_body">
-       <!-- here is backend code needed to display result according to filters and search button -->
-        <!-- search button have to display  data according to class code/id -->
-        <tr class="table_body_row">
-          <td class="table_body_data">FY1-2025</td>
-          <td class="table_body_data"><span class="badge bg-primary">Foundation 1</span></td>
-          <td class="table_body_data"><span class="badge bg-info">NONE</span></td>
-          <!-- display number of all current enrolled student  -->
-          <td class="table_body_data"><span class="badge bg-primary">25</span></td> 
-          <td class="view_btn">
-            <!-- here view_student.html is linked so as user clicked to view details then it will go to that page -->
-            <div class="view_action-buttons">
-              <a href="view_class_details.html" class="view_btn_design">VIEW DETAILS</a>
-            </div>
-          </td>
-
-        </tr>
-      
-    </tbody>
-  </table>
-  
-</section>
-<!-- record not founded -->
- <section class="common_background record_not_founded_background">
-  <table class="table_founded_student">
+  <!-- classes table -->
+  <section class="common_background record_founded_background">
+    <table class="table_founded_student">
       <thead>
         <tr class="student_header">
-        <th class="student_data">Class-code</th>
-        <th class="student_data">Class</th>
-        <th class="student_data">Section</th>
-        <th class="student_data">Students</th>
-        <th class="student_data">Action</th>
+          <th>Class Code</th>
+          <th>Class</th>
+          <th>Section</th>
+          <th>Enrolled</th>
+          <th>Action</th>
         </tr>
       </thead>
-
-  </table>
-  <article class="record_not_found">No Records Found...</article>
-</section>
+      <tbody>
+        {% if classes %}
+          {% for c in classes %}
+            <tr>
+              <td>{{ c.class_id }}</td>
+              <td><span class="badge bg-primary">{{ c.class_name }}</span></td>
+              <td><span class="badge bg-info">{{ c.section or 'NONE' }}</span></td>
+              <td><span class="badge bg-primary">{{ c.student_count }}</span></td>
+              <td class="view_btn">
+                <div class="view_action-buttons">
+                <a href="{{ url_for('view_class_details', class_id=c.class_id) }}"
+                   class="view_btn_design">
+                  VIEW DETAILS
+                </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center">No Records Found...</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </section>
 </body>
 </html>
