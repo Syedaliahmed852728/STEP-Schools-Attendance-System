@@ -247,6 +247,110 @@ def get_student(student_id: str):
     }
 
 
+def prepare_view_student_details_data(with_sql_cursor, stud_id) -> dict:
+    """
+    Fetch a single student's full profile and attendance history.
+    Returns a dict with:
+      - 'student': {
+            stud_id,
+            stud_name,
+            stud_class_name,
+            stud_class_section,
+            stud_class_session,
+            stud_parent_name,
+            stud_parent_contact_number,
+            stud_fee_status,
+            attendance_percentage,
+            total_attendance,
+            total_days
+        }
+      - 'attendance_history': [ {date_full, status, arrival_time, departure_time}, ... ]
+    """
+    today          = datetime.now().strftime('%d-%m-%Y')
+    current_month  = datetime.now().strftime('%B %Y')
+
+    with with_sql_cursor() as (_, cur):
+        # 1) Fetch student base record
+        cur.execute("""
+            SELECT 
+              s.stud_id,
+              s.stud_name,
+              c.class_name,
+              c.section      AS class_section,
+              c.session      AS class_session,
+              p.parent_name,
+              p.parent_contact_number
+            FROM student_table s
+            LEFT JOIN class_table   c ON s.class_id  = c.class_id
+            LEFT JOIN parent_table  p ON s.parent_id = p.parent_id
+            WHERE s.stud_id = ?
+        """, (stud_id,))
+        row = cur.fetchone()
+        if not row:
+            return {}    # or raise abort(404)
+
+        student = {
+            "stud_id":                    row["stud_id"],
+            "stud_name":                  row["stud_name"],
+            "stud_class_name":            row["class_name"]     or "—",
+            "stud_class_section":         row["class_section"]  or "—",
+            "stud_class_session":         row["class_session"]  or "—",
+            "stud_parent_name":           row["parent_name"]    or "—",
+            "stud_parent_contact_number": row["parent_contact_number"] or "—",
+        }
+
+        # 2) Fee status for current month
+        cur.execute("""
+            SELECT 
+              CASE 
+                WHEN status IS NULL OR status = 'None' THEN 'Unpaid'
+                ELSE status
+              END AS fee_status
+            FROM fee_table
+            WHERE stud_id = ? AND month_name = ?
+            LIMIT 1
+        """, (stud_id, current_month))
+        fee_row = cur.fetchone()
+        student["stud_fee_status"] = fee_row["fee_status"] if fee_row else "Unpaid"
+
+        # 3) Full attendance history
+        cur.execute("""
+            SELECT date_full, status, arrival_time, departure_time
+            FROM attendance_table
+            WHERE stud_id = ?
+            ORDER BY 
+              -- assuming DD-MM-YYYY; convert to YYYY-MM-DD for proper ordering:
+              substr(date_full, 7, 4) || '-' ||
+              substr(date_full, 4, 2) || '-' ||
+              substr(date_full, 1, 2) DESC
+        """, (stud_id,))
+        history = [dict(r) for r in cur.fetchall()]
+
+        # 4) Compute totals & percentage (only Present/Absent count)
+        cur.execute("""
+            SELECT status, COUNT(*) AS cnt
+            FROM attendance_table
+            WHERE stud_id = ?
+            GROUP BY status
+        """, (stud_id,))
+        counts = {r["status"]: r["cnt"] for r in cur.fetchall()}
+        present = counts.get("Present", 0)
+        absent  = counts.get("Absent",  0)
+        total   = present + absent
+        pct     = round((present / total) * 100, 2) if total > 0 else 0.0
+
+        student.update({
+            "total_attendance":    present,
+            "total_days":          total,
+            "attendance_percentage": pct
+        })
+
+    return {
+        "student":            student,
+        "attendance_history": history
+    }
+
+
 def prepare_student_index_data(with_sql_cursor, args) -> dict:
     """
     Gather data for the student index template based on request args.
@@ -437,6 +541,13 @@ def permanent_delete_student(stud_id):
         )
         logger.info(f"Deleted fee records for student {stud_id}")
 
+        # Delete attendance records
+        cursor.execute(
+            "DELETE FROM attendance_table WHERE stud_id = ?",
+            (stud_id,)
+        )
+        logger.info(f"Deleted attendance records for student {stud_id}")
+
         # Delete student record
         cursor.execute(
             "DELETE FROM student_table WHERE stud_id = ?",
@@ -504,6 +615,10 @@ def mark_left_student(stud_id: str):
         cursor.execute("SELECT * FROM fee_table WHERE stud_id = ?", (stud_id,))
         fees = cursor.fetchall()
 
+        cursor.execute("SELECT * FROM attendance_table WHERE stud_id = ?", (stud_id,))
+        attendance_records = cursor.fetchall()
+
+
         parent = None
         if student[2]:
             cursor.execute("SELECT * FROM parent_table WHERE parent_id = ?", (student[2],))
@@ -512,6 +627,24 @@ def mark_left_student(stud_id: str):
         if student[3]:
             cursor.execute("SELECT * FROM class_table where class_id = ?", (student[3],))
             class_or_grade = cursor.fetchone()
+
+
+        cursor.execute("""
+            SELECT promoted_id,
+                   stud_id,
+                   parent_id,
+                   session,
+                   class_name,
+                   student_name,
+                   parent_name,
+                   total_present,
+                   total_absent,
+                   fee_status
+            FROM promoted_table
+            WHERE stud_id = ?
+        """, (stud_id,))
+        promoted_entries = cursor.fetchall()
+
 
     with archive_db_cursor() as (a_conn, a_cursor):
         a_cursor.execute("""
@@ -534,5 +667,33 @@ def mark_left_student(stud_id: str):
                 INSERT INTO fee_table (fee_id, paid_data, month_name, status, stud_id)
                 VALUES (?, ?, ?, ?, ?)
             """, fee)
+
+        for record in attendance_records:
+            a_cursor.execute(
+                """
+                INSERT INTO attendance_table (
+                    stud_id, date_full, arrival_time, departure_time, status
+                ) VALUES (?, ?, ?, ?, ?)
+                """, record
+            )
+
+
+        for p in promoted_entries:
+            a_cursor.execute("""
+                INSERT OR IGNORE INTO promoted_table (
+                    promoted_id,
+                    stud_id,
+                    parent_id,
+                    session,
+                    class_name,
+                    student_name,
+                    parent_name,
+                    total_present,
+                    total_absent,
+                    fee_status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, p)
+
+
 
     permanent_delete_student(stud_id=stud_id)

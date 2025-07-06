@@ -91,12 +91,40 @@
               <td><span class="badge bg-primary">{{ c.class_name }}</span></td>
               <td><span class="badge bg-info">{{ c.section or 'NONE' }}</span></td>
               <td><span class="badge bg-primary">{{ c.student_count }}</span></td>
-              <td class="view_btn">
-                <div class="view_action-buttons">
-                <a href="{{ url_for('view_class_details', class_id=c.class_id) }}"
-                   class="view_btn_design">
-                  VIEW DETAILS
-                </a>
+              <td class="position-relative text-center">
+                <!-- VIEW DETAILS -->
+                <a 
+                  href="{{ url_for('view_class_details', class_id=c.class_id) }}"
+                  class="btn btn-sm btn-outline-primary mb-1"
+                >VIEW DETAILS</a>
+
+                <!-- DELETE TRIGGER -->
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger showOptionsBtn"
+                >DELETE</button>
+
+                <!-- OVERLAY OPTIONS BOX -->
+                <div class="del_btn_option d-none">
+                  <h5 class="del_btn_heading">WARNING!</h5>
+                  <p class="para_A">“Delete Permanently” is irreversible.</p>
+                  <p>“Mark as Left” moves the class data to archive.</p>
+                  <form method="POST" action="{{ url_for('delete_class', class_id=c.class_id) }}">
+                    <div class="btn_Section">
+                      <button
+                        type="submit"
+                        name="action"
+                        value="delete"
+                        class="btn_A"
+                      >DELETE PERMANENTLY</button>
+                      <button
+                        type="submit"
+                        name="action"
+                        value="left"
+                        class="btn_B"
+                      >MARK AS LEFT</button>
+                    </div>
+                  </form>
                 </div>
               </td>
             </tr>
@@ -109,5 +137,15 @@
       </tbody>
     </table>
   </section>
+
+<script>
+  document.querySelectorAll(".showOptionsBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const overlay = btn.parentElement.querySelector(".del_btn_option");
+      overlay.classList.toggle("d-none");
+    });
+  });
+</script>
+
 </body>
 </html>

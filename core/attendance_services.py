@@ -186,11 +186,11 @@ def _attendance_capture_loop():
             panel = mode1_base.copy()
 
             # — top‑center headshot: width -5px, height -10px, moved down +10px
-            base_w, base_h = 200, 200
+            base_w, base_h = 220, 240
             pw = base_w      # 195px wide
             ph = base_h - 10     # 190px tall
             x_photo = (panel.shape[1] - pw) // 2
-            y_photo = 60 + 60    # originally 60 + 50; now +10 more =110 → 120 total
+            y_photo = 60 + 65    # originally 60 + 50; now +10 more =110 → 120 total
             if headshot is not None:
                 face = cv2.resize(headshot, (pw, ph))
                 panel[y_photo:y_photo+ph, x_photo:x_photo+pw] = face
@@ -200,31 +200,31 @@ def _attendance_capture_loop():
             cv2.putText(
                 panel,
                 str(total),
-                (20, 55),                    # 40→55
+                (55, 75),                    # 40→55
                 cv2.FONT_HERSHEY_DUPLEX,
                 1.0,                         # reduced from 1.2 → 1.0
                 (255,255,255),
-                2
+                1
             )
 
             # — remove literal “ID:”/“Major:” but still draw their VALUES
             cv2.putText(
                 panel,
                 info['stud_id'],
-                (panel.shape[1]//2 - 100, 430),
+                (panel.shape[1]//2 - 15, 455),
                 cv2.FONT_HERSHEY_DUPLEX,
                 1.0,
                 (255,255,255),
-                2
+                1
             )
             cv2.putText(
                 panel,
                 info['stud_class_name'],
-                (panel.shape[1]//2 - 100, 480),
+                (panel.shape[1]//2 - 15, 510),
                 cv2.FONT_HERSHEY_DUPLEX,
                 1.0,
                 (255,255,255),
-                2
+                1
             )
 
             # 4) Save dynamic panel
@@ -247,9 +247,92 @@ def _attendance_capture_loop():
 
         elif sid and event == 'departure':
             logger.debug(f"Event DEPARTURE for {sid}")
+            # 1) Mark attendance
             MarkAttendance(sid)
-            _mode_q.put('mode3')
-            current_mode, mode_time = 3, now
+
+            # 2) Fetch student info + headshot
+            info = get_student(student_id=sid)
+            headshot = None
+            for ext in ('.jpg','.jpeg','.png'):
+                p = Path(Config.STUD_IMAGES_FILE) / f"{sid}{ext}"
+                if p.exists():
+                    headshot = cv2.imread(str(p))
+                    break
+
+            # 3) Compose the dynamic mode1 panel
+            panel = mode1_base.copy()
+
+            # — top‑center headshot: width -5px, height -10px, moved down +10px
+            base_w, base_h = 220, 240
+            pw = base_w      # 195px wide
+            ph = base_h - 10     # 190px tall
+            x_photo = (panel.shape[1] - pw) // 2
+            y_photo = 60 + 65    # originally 60 + 50; now +10 more =110 → 120 total
+            if headshot is not None:
+                face = cv2.resize(headshot, (pw, ph))
+                panel[y_photo:y_photo+ph, x_photo:x_photo+pw] = face
+
+            # — top‑left total attendance: smaller text, moved down +15px
+            total = info["total_attendance"]
+            cv2.putText(
+                panel,
+                str(total),
+                (55, 75),                    # 40→55
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.0,                         # reduced from 1.2 → 1.0
+                (255,255,255),
+                1
+            )
+
+            box_w = pw + 30                     # 20px wider than the headshot
+            box_h = int(0.6 * ph) - 15          # 10px shorter than 60% of headshot height
+            x_box = x_photo - 15               # shift left 10px so box stays centered around headshot
+            y_box = y_photo + ph + 45           # 10px more below than before (was +10, now +20)
+
+            cv2.rectangle(
+                panel,
+                (x_box, y_box),
+                (x_box + box_w, y_box + box_h),
+                (139, 0, 0),                    # dark‑blue in BGR
+                cv2.FILLED
+            )
+
+            # — put centered “GOODBYE” text inside that box
+            text = "GOODBYE"
+            font = cv2.FONT_HERSHEY_DUPLEX
+            font_scale = 1.0
+            thickness = 2
+
+            # measure text size so we can center it
+            (text_w, text_h), baseline = cv2.getTextSize(text, font, font_scale, thickness)
+            x_text = x_box + (box_w - text_w) // 2
+            y_text = y_box + (box_h + text_h) // 2
+
+            cv2.putText(
+                panel,
+                text,
+                (x_text, y_text),
+                font,
+                font_scale,
+                (255, 255, 255),               # white text
+                thickness
+            )
+
+            # 4) Save dynamic panel
+            tmp = Path("static/web_images/mode1_temp.png")
+            cv2.imwrite(str(tmp), panel)
+
+            # 5) Queue it
+            _mode_q.put("mode1_temp")
+            current_mode, mode_time = 1, now
+
+            # 6) Hold for duration
+            time.sleep(Config.MODE_DISPLAY_DURATION)
+
+            # 7) Reset
+            _mode_q.put("mode0")
+            current_mode, mode_time = 0, None
+            continue
 
         elif sid and event == 'repeat':
             logger.debug(f"Event REPEAT for {sid}")
@@ -257,7 +340,7 @@ def _attendance_capture_loop():
             current_mode, mode_time = 3, now
 
         # reset after display duration
-        if current_mode in (1, 3) and mode_time and now - mode_time > Config.MODE_DISPLAY_DURATION:
+        if current_mode in (1, 3, 4) and mode_time and now - mode_time > Config.MODE_DISPLAY_DURATION:
             _mode_q.put('mode0')
             current_mode, mode_time = 0, None
 
@@ -282,13 +365,67 @@ def start_attendance_loop() -> bool:
     return True
 
 
+def marking_off_to_classes_where_all_students_are_absent(class_id: str):
+    """
+    If all students in class_id are marked 'Absent' today, mark them 'Off'.
+    Does not stop the camera loop.
+    """
+    today = datetime.now().strftime("%d-%m-%Y")
+    with with_sql_cursor() as (_, cur):
+        # Total students in class
+        cur.execute("SELECT COUNT(*) FROM student_table WHERE class_id = ?", (class_id,))
+        total_students = cur.fetchone()[0]
+
+        # Count absent students today
+        cur.execute(
+            """
+            SELECT COUNT(*)
+              FROM attendance_table a
+              JOIN student_table s USING(stud_id)
+             WHERE s.class_id = ?
+               AND a.date_full = ?
+               AND a.status = 'Absent'
+            """, (class_id, today)
+        )
+        absent_count = cur.fetchone()[0]
+
+        if total_students > 0 and absent_count == total_students:
+            logger.info(f"All {total_students} students in class {class_id} are Absent on {today}; marking Off.")
+            cur.execute(
+                """
+                UPDATE attendance_table
+                   SET status = 'Off', arrival_time = NULL, departure_time = NULL
+                 WHERE stud_id IN (
+                     SELECT stud_id FROM student_table WHERE class_id = ?
+                 )
+                   AND date_full = ?
+                   AND status = 'Absent'
+                """, (class_id, today)
+            )
+
+
 def stop_attendance_loop() -> bool:
-    global _camera_running
+    """
+    Apply attendance-off marking for any class where all students are Absent today,
+    then stop the camera loop.
+    """
+    # 1) Process each class
+    with with_sql_cursor() as (_, cur):
+        cur.execute("SELECT class_id FROM class_table")
+        class_ids = [row[0] for row in cur.fetchall()]
+
+    for cid in class_ids:
+        marking_off_to_classes_where_all_students_are_absent(cid)
+
+    # 2) Stop the camera loop
     with _camera_lock:
+        global _camera_running
         if not _camera_running:
             logger.warning("Attendance loop not running")
             return False
         _camera_running = False
+
+    logger.info("Attendance loop stopped for all classes.")
     return True
 
 

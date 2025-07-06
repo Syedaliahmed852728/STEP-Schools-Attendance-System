@@ -87,14 +87,26 @@ class VectorStore:
 
 
 
-# with with_sql_cursor() as (conn, cur):
-#     # ensure you're using the Row factory (it sounds like you already are)
-#     conn.row_factory = sqlite3.Row  
-#     cur = conn.cursor()
+with with_sql_cursor() as (conn, cur):
+    # ensure you're using the Row factory (it sounds like you already are)
+    conn.row_factory = sqlite3.Row  
+    cur = conn.cursor()
 
-#     cur.execute("SELECT * FROM attendance_table")
-#     rows = cur.fetchall()
+    cur.execute("SELECT * FROM attendance_table")
+    rows = cur.fetchall()
 
-#     for row in rows:
-#         # as a dict, so you see column names and values:
-#         print(dict(row))
+    for row in rows:
+        # as a dict, so you see column names and values:
+        print(dict(row))
+
+
+
+# import cv2
+
+# # Read image
+# image = cv2.imread("static\web_images\mode1.png")
+
+# # Get dimensions
+# height, width, channels = image.shape
+
+# print(f"Width: {width}, Height: {height}")

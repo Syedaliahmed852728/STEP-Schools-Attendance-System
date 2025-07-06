@@ -11,7 +11,7 @@ class Config:
     VECTOR_STORE_NAME: str = os.getenv("VECTOR_STORE", "vector_store")
     STUD_IMAGES_FOLDER_NAME: str = os.getenv("STUD_IMAGES_FOLDER_NAME", "student_images")
 
-    DEPARTURE_MINUTES = 2
+    DEPARTURE_MINUTES = 1
     FRAME_WIDTH, FRAME_HEIGHT = 640, 480
     FACE_MATCH_THRESHOLD = 0.60
     MODE_DISPLAY_DURATION= 3
@@ -22,8 +22,10 @@ class Config:
     STORAGE_PATH: Path = Path(os.getenv("STORAGE_PATH", "./data"))
     DB_NAME: str = os.getenv("DB_NAME", "STEP_SCHOOL_DB")
     MARK_LEFT_DB_NAME = os.getenv("MARK_LEFT_DB_NAME", "LEFT_STEP_SCHOOL_DB")
+    # PROMOTED_DB_NAME = os.getenv("PROMOTED_DB_NAME", "PROMOTED_DB")
     DB: Path = STORAGE_PATH / f"{DB_NAME}.sqlite3"
     LEFT_DB:Path = STORAGE_PATH / f"{MARK_LEFT_DB_NAME}.sqlite3"
+    # PROMOTED_DB:Path = STORAGE_PATH/ f"{PROMOTED_DB_NAME}.sqlite3"
     VECTOR_STORE_FILE: Path = STORAGE_PATH / f"{VECTOR_STORE_NAME}.pkl"
     STUD_IMAGES_FILE: Path = STORAGE_PATH / STUD_IMAGES_FOLDER_NAME
 

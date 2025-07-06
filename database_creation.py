@@ -98,7 +98,37 @@ SCHEMAS = {
             "departure_time": "TEXT",
             "status":         "TEXT CHECK(status IN ('Present', 'Absent', 'Off'))"
         }
+    },
+
+    "promoted_table": {
+        "create_sql": """
+            CREATE TABLE IF NOT EXISTS promoted_table (
+                promoted_id   TEXT PRIMARY KEY,             
+                stud_id       TEXT NOT NULL,
+                parent_id     TEXT NOT NULL,
+                session       TEXT NOT NULL,
+                class_name    TEXT NOT NULL,
+                student_name  TEXT NOT NULL,
+                parent_name   TEXT,
+                total_present INTEGER,
+                total_absent  INTEGER,
+                fee_status    TEXT
+            );
+        """,
+        "columns": {
+            "promoted_id":   "TEXT PRIMARY KEY",
+            "stud_id":       "TEXT NOT NULL",
+            "parent_id":     "TEXT NOT NULL",
+            "session":       "TEXT NOT NULL",
+            "class_name":    "TEXT NOT NULL",
+            "student_name":  "TEXT NOT NULL",
+            "parent_name":   "TEXT",
+            "total_present": "INTEGER",
+            "total_absent":  "INTEGER",
+            "fee_status":    "TEXT"
+        }
     }
+
 }
 
 def get_existing_columns(cursor, table_name):
@@ -143,9 +173,12 @@ db_path = Config.STORAGE_PATH
 Path(db_path).mkdir(parents=True, exist_ok=True)
 full_db_path = Config.DB
 full_mark_left_db_path = Config.LEFT_DB
+# full_promoted_student_prev_db_path = Config.PROMOTED_DB
 
 database_creation(full_db_path=full_db_path, schemas=SCHEMAS)
 
 database_creation(full_db_path=full_mark_left_db_path, schemas=SCHEMAS)
+
+
 
 

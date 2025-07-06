@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, Response, stream_with_context, send_file
 from utils import with_sql_cursor
-from datetime import date
-from core.student_services import add_the_new_student, get_student,prepare_student_index_data, update_the_student, permanent_delete_student, mark_left_student
+from datetime import date, datetime
+from core.student_services import add_the_new_student, get_student,prepare_student_index_data, update_the_student, permanent_delete_student, mark_left_student, prepare_view_student_details_data
 from core.fee_services import (
     get_fee_records_by_student,
     add_fee_record,
@@ -27,7 +27,7 @@ from core.attendance_services import (
 )
 import pandas as pd
 
-from core.class_services import prepare_class_index_data, prepare_view_class_details_data
+from core.class_services import prepare_class_index_data, prepare_view_class_details_data, permanent_delete_class, archive_class
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -132,6 +132,49 @@ def view_student_details(student_id):
     student_detail = get_student(student_id=student_id)
     return render_template('student/view_student_details.html', student=student_detail)
 
+
+@app.route("/students/<stud_id>/export-attendance", methods=["GET"])
+def export_student_attendance(stud_id):
+    # 1) Re‑use whatever you use to fetch the student + their attendance history
+    #    e.g. a function prepare_view_student_details_data
+    data = prepare_view_student_details_data(with_sql_cursor, stud_id)
+    if not data.get("student"):
+        abort(404, f"No such student: {stud_id}")
+
+    history = data["attendance_history"]  # list of dicts with date_full, status, arrival_time, departure_time
+
+    # 2) Filter if needed
+    option = request.args.get("export_option", "current_month")
+    if option == "current_month":
+        current_month = datetime.now().strftime("%B %Y")
+        history = [
+            r for r in history
+            if datetime.strptime(r["date_full"], "%d-%m-%Y").strftime("%B %Y") == current_month
+        ]
+
+    # 3) Build DataFrame
+    df = pd.DataFrame(history)
+    df = df.rename(columns={
+        "date_full":      "Date",
+        "status":         "Status",
+        "arrival_time":   "Arrival Time",
+        "departure_time": "Departure Time"
+    })
+
+    # 4) Write CSV into memory
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+    csv_buffer.seek(0)
+
+    # 5) Send as CSV download
+    filename = f"{stud_id}_attendance.csv"
+    return Response(
+        csv_buffer.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}"
+        }
+    )
 
 @app.route('/students/update', methods=["GET"])
 def Search_update_student():
@@ -348,6 +391,27 @@ def mode_feed():
 def class_index():
     data = prepare_class_index_data(with_sql_cursor, request.args)
     return render_template("classes/class_manage.html", **data)
+
+
+@app.route("/classes/<class_id>/delete", methods=["POST"])
+def delete_class(class_id):
+    action = request.form.get("action")
+    try:
+        if action == "delete":
+            permanent_delete_class(class_id)
+            flash(f"Class {class_id} and all its data permanently deleted.", "success")
+
+        elif action == "left":
+            archive_class(class_id)
+            flash(f"Class {class_id} and all its data moved to archive.", "success")
+
+        else:
+            flash("Unknown action.", "warning")
+
+    except Exception as e:
+        flash(f"Error processing class {class_id}: {e}", "danger")
+
+    return redirect(url_for("class_index"))
 
 
 @app.route("/classes/<class_id>", methods=["GET"])
