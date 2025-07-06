@@ -13,7 +13,6 @@ from config import Config
 from datetime import datetime, timedelta
 from core.student_services import get_student
 
-# ─── Logging setup ────────────────────────────────────────────────────────────
 logger = logging.getLogger("attendance")
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
@@ -22,17 +21,13 @@ handler.setFormatter(logging.Formatter(
 ))
 logger.addHandler(handler)
 
-# ─── Mode‐event queue for SSE ─────────────────────────────────────────────────
 _mode_q = queue.Queue()
 
-# ─── Camera frame buffer ─────────────────────────────────────────────────────
 _camera       = None
 _camera_lock  = threading.Lock()
 _camera_running = False
 
-# ─── Face encodings store ─────────────────────────────────────────────────────
 vector_store = VectorStore(Path(Config.VECTOR_STORE_FILE))
-
 
 def mark_absentees_before_attendance() -> None:
     """Mark everyone absent at start if not already in DB."""

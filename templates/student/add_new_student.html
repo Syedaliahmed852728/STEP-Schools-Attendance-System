@@ -19,9 +19,9 @@
         <nav>
             <a class="top_menu" href="{{ url_for('home') }}">Home</a>
             <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
-            <a class="top_menu" href="../../templates/classes/class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="../../templates/attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="../../templates/fee/fee_management.html">FEE</a>
+            <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
+            <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
+            <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
             <a class="top_menu" href="../../templates/history/history.html">History</a>
         </nav>
         <div class="title">
@@ -48,12 +48,12 @@
         <span class="text_menu">Add Student</span>
         </a>
      
-        <a href="Search_update_student.html" class="menu_desig">
+        <a href="{{ url_for('Search_update_student') }}" class="menu_desig">
         <img class="icon_menu"  src="{{ url_for('static', filename='web_images/update.png') }}" alt="update Student">
         <span class="text_menu">Update Student</span>
         </a>
 
-         <a href="delete_student.html" class="menu_desig">
+         <a href="{{ url_for('delete_student') }}" class="menu_desig">
         <img class="icon_menu"  src="{{ url_for('static', filename='web_images/delete.png') }}" alt="Delete Student">
         <span class="text_menu">Delete Student</span>
         </a>

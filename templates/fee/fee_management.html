@@ -19,9 +19,8 @@
         <nav>
             <a class="top_menu" href="{{ url_for('home') }}">Home</a>
             <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
-            <!-- Adjust other links to use url_for or correct static paths -->
-            <a class="top_menu" href="../../templates/classes/class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="../../templates/attendance/attendance_index.html">Attendance</a>
+            <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
+            <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
             <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
             <a class="top_menu" href="../../templates/history/history.html">History</a>
         </nav>
