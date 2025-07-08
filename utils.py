@@ -92,7 +92,7 @@ with archive_db_cursor() as (conn, cur):
     conn.row_factory = sqlite3.Row  
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM student_table")
+    cur.execute("SELECT * FROM class_table")
     rows = cur.fetchall()
 
     for row in rows:

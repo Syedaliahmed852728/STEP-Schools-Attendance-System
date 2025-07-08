@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, Response, stream_with_context, send_file
-from utils import with_sql_cursor
+from utils import with_sql_cursor, archive_db_cursor
 from datetime import date, datetime
-from core.student_services import add_the_new_student, get_student,prepare_student_index_data, update_the_student, permanent_delete_student, mark_left_student, prepare_view_student_details_data
+from core.student_services import add_the_new_student, get_student,prepare_student_index_data, update_the_student, permanent_delete_student, mark_left_student, prepare_view_student_details_data, get_left_student
 from core.fee_services import (
     get_fee_records_by_student,
     add_fee_record,
@@ -465,6 +465,20 @@ def export_class(class_id):
         download_name=filename,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+@app.route("/history", methods=["GET"])
+def history():
+    data = prepare_student_index_data(archive_db_cursor, request.args)
+    return render_template(
+        "history/history.html",
+        **data
+    )
+
+
+@app.route("/history/<student_id>")
+def view_left_student_details(student_id):
+    student_detail = get_left_student(student_id=student_id)
+    return render_template('student/view_left_student_details.html', student=student_detail)
 
 if __name__ == '__main__':
     app.run(debug=True)

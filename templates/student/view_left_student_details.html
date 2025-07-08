@@ -34,31 +34,13 @@
 <section class="main_Container">
     <div class="main_heading">
         <h1 class="static_txt">Student</h1>
-        <h1 class="dynamic_txt">Management</h1>
+        <h1 class="dynamic_txt">History</h1>
     </div>
 </section>
 
-    <menu class="Stud_menu">
-     
-        <a href="{{ url_for('add_student') }}" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/add.png') }}" alt="Add Student">
-        <span class="text_menu">Add Student</span>
-        </a>
-     
-        <a href="{{ url_for('Search_update_student') }}" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/update.png') }}" alt="update Student">
-        <span class="text_menu">Update Student</span>
-        </a>
-
-         <a href="{{ url_for('delete_student') }}" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/delete.png') }}" alt="Delete Student">
-        <span class="text_menu">Delete Student</span>
-        </a>
-    </menu>
-
 <div class="container position-relative">
     <div class="header-wrapper text-center mb-5">
-        <a href="{{ url_for('student_index') }}" class="close-btn hover-grow" aria-label="Close dashboard">
+        <a href="{{ url_for('history') }}" class="close-btn hover-grow" aria-label="Close dashboard">
             <span class="cross-icon">x</span>
         </a>
         <h2 class="main-heading">
@@ -114,7 +96,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> 
 
                     <div class="progress-section">
                         <h4 class="section-title">Attendance Overview</h4>
@@ -154,82 +136,8 @@
                     </div>
 
                     <section class="export-attendance-section mb-5 p-4 bg-light rounded">
-                    <h5 class="mb-3">Export Attendance</h5>
-                    <form
-                        method="GET"
-                        action="{{ url_for('export_student_attendance', stud_id=student.stud_id) }}"
-                    >
-                        <div class="mb-3">
-                        <div class="form-check">
-                            <input
-                            class="form-check-input"
-                            type="radio"
-                            name="export_option"
-                            id="exportAll"
-                            value="all"
-                            >
-                            <label class="form-check-label" for="exportAll">
-                            Complete History
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                            class="form-check-input"
-                            type="radio"
-                            name="export_option"
-                            id="exportMonth"
-                            value="current_month"
-                            checked
-                            >
-                            <label class="form-check-label" for="exportMonth">
-                            Current Month Only
-                            </label>
-                        </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                        📥 Download CSV
-                        </button>
-                    </form>
-                    </section>
                     
-                    <div class="attendance-history mt-5">
-                        <div class="history-header text-center">
-                            <h4 class="section-title">
-                                <i class="bi bi-clock-history"></i> Attendance Chronology
-                            </h4>
-                            <p class="section-subtitle">Detailed Daily Attendance Records</p>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="glass-table-header">
-                                    <tr>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Arrival Time</th>
-                                        <th scope="col">Departure Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for record in student.attendance_history %}
-                                    <tr class="hover-scale">
-                                        <td>{{ record.date_full }}</td>
-                                        <td>
-                                            {{ record.status }}
-                                            {% if record.status == 'Present' %}<span class="badge bg-success ms-2">P</span>
-                                            {% elif record.status == 'Absent' %}<span class="badge bg-danger ms-2">A</span>
-                                            {% else %}<span class="badge bg-secondary ms-2">Off</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ record.arrival_time or '--' }}</td>
-                                        <td>{{ record.departure_time or '--' }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
-                </div>
             </div>
         </div>
     </div>

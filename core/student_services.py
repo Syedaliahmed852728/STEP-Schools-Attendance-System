@@ -247,6 +247,109 @@ def get_student(student_id: str):
     }
 
 
+
+
+def get_left_student(student_id: str):
+    # 1️⃣ First, pull basic student, class, parent info (no fee status here)
+    student_detail_query = """
+    SELECT
+        s.stud_id,
+        s.stud_name,
+        c.class_name    AS stud_class_name,
+        c.section       AS stud_class_section,
+        c.session       AS stud_class_session,
+        p.parent_id     AS stud_parent_id,
+        p.parent_name   AS stud_parent_name,
+        p.parent_contact_number AS stud_parent_contact_number
+    FROM student_table AS s
+    LEFT JOIN class_table   AS c ON s.class_id   = c.class_id
+    LEFT JOIN parent_table  AS p ON s.parent_id  = p.parent_id
+    WHERE s.stud_id = ?
+    LIMIT 1;
+    """
+
+    with archive_db_cursor() as (_, cur):
+        cur.execute(student_detail_query, (student_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+
+        # 2️⃣ Attendance stats
+        cur.execute(
+            "SELECT COUNT(*) FROM attendance_table WHERE stud_id = ? AND status = 'Present'",
+            (student_id,)
+        )
+        present_count = cur.fetchone()[0] or 0
+
+        cur.execute(
+            "SELECT COUNT(*) FROM attendance_table WHERE stud_id = ? AND status != 'Off'",
+            (student_id,)
+        )
+        total_days = cur.fetchone()[0] or 0
+
+        percentage = (present_count / total_days * 100) if total_days > 0 else 0.0
+
+        # 3️⃣ Attendance history (last 30 records)
+        cur.execute("""
+            SELECT date_full, status, arrival_time, departure_time
+            FROM attendance_table
+            WHERE stud_id = ?
+            ORDER BY date_full DESC
+            LIMIT 30
+        """, (student_id,))
+        attendance_history = cur.fetchall()
+
+        # 4️⃣ Fee histories
+        cur.execute("""
+            SELECT challan_no, paid_data, status, month_name, amount
+            FROM fee_table
+            WHERE stud_id = ?
+            ORDER BY paid_data DESC
+            LIMIT 10
+        """, (student_id,))
+        current_class_fees = cur.fetchall()
+
+        cur.execute("""
+            SELECT challan_no, paid_data, status, month_name, amount, stud_id
+            FROM fee_table
+            WHERE stud_id = ?
+            ORDER BY paid_data DESC
+        """, (student_id,))
+        complete_fee_history = cur.fetchall()
+
+        # 5️⃣ Now, override the fee status to reflect *this month*:
+        current_month = datetime.now().strftime("%B %Y")   # e.g. "July 2025"
+        cur.execute(
+            "SELECT status FROM fee_table WHERE stud_id = ? AND month_name = ?",
+            (student_id, current_month)
+        )
+        fee_row = cur.fetchone()
+        if fee_row and fee_row["status"] == "Paid":
+            fee_status = "Paid"
+        else:
+            # either no record for this month, or not paid
+            # optionally, you could even INSERT a default “Unpaid” row here
+            fee_status = "Unpaid"
+
+    return {
+        "stud_id": row["stud_id"],
+        "stud_name": row["stud_name"],
+        "stud_class_name": row["stud_class_name"],
+        "stud_class_section": row["stud_class_section"],
+        "stud_class_session": row["stud_class_session"],
+        "stud_parent_id": row["stud_parent_id"],
+        "stud_parent_name": row["stud_parent_name"],
+        "stud_parent_contact_number": row["stud_parent_contact_number"],
+        "stud_fee_status": fee_status,
+        "total_attendance": present_count,
+        "total_days": total_days,
+        "attendance_percentage": round(percentage, 2),
+        "attendance_history": attendance_history,
+        "current_class_fees": current_class_fees,
+        "complete_fee_history": complete_fee_history
+    }
+
+
 def prepare_view_student_details_data(with_sql_cursor, stud_id) -> dict:
     """
     Fetch a single student's full profile and attendance history.

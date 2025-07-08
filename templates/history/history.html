@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="history.css">
-    <link rel="shortcut icon" href="../web_images/logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='history/history.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='web_images/logo.png') }}" type="image/x-icon">
     <title>Record Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,16 +14,19 @@
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-        <header class="header">
-        <img id="logo_img"  src="../web_images/logo.png" alt="Logo">
+    <header class="header">
+        <!-- Logo -->
+        <img id="logo_img" src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
+        <!-- Navigation -->
         <nav>
             <a class="top_menu" href="{{ url_for('home') }}">Home</a>
             <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
             <a class="top_menu" href="{{ url_for('class_index') }}">Classes</a>
             <a class="top_menu" target="_blank" href="{{ url_for('attendance') }}">Attendance</a>
             <a class="top_menu" href="{{ url_for('fee_management') }}">FEE</a>
-            <a class="top_menu" href="../../templates/history/history.html">History</a>
+            <a class="top_menu" href="{{ url_for('history') }}">History</a>
         </nav>
+
         <div class="title">
             <h1 id="title_name_heading">STEP Schools</h1>
             <p id="title_name_city">Talagang</p>
@@ -31,7 +34,7 @@
         </div>
 
         <div class="menu_image">
-        <img class="Menu-option-image"  src="../web_images/menu.png" alt="Menu-option">
+        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
         </div>
     
     </header>
@@ -47,311 +50,103 @@
         <p class="lead_text">Comprehensive academic journey records from Foundation Year to STEP levels</p>
     </div>
 
-    
-    <!-- Filters and Search -->
+    <!-- filters and search bar -->
     <section class="common_background filter_search_background">
+      <form method="GET" action="{{ url_for('history') }}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
         <!-- Class filter -->
         <div class="class_section_filter_headings">
-            <h1 class="filters_headings">Class:</h1>
-            <select name="class" id="class_selection">
-                <option value="">Select Class</option>
-                <option value="fy1">FOUNDATION YEAR 1</option>
-                <option value="fy2">FOUNDATION YEAR 2</option>
-                <option value="fy3">FOUNDATION YEAR 3</option>
-                <option value="step1">STEP 1</option>
-                <option value="step2">STEP 2</option>
-                <option value="step3">STEP 3</option>
-                <option value="step4">STEP 4</option>
-                <option value="step5">STEP 5</option>
-                <option value="step6">STEP 6</option>
-                <option value="step7">STEP 7</option>
-            </select>
+          <h1 class="filters_headings">Class:</h1>
+          <select name="class_name" id="class_selection">
+            <!-- blank placeholder option -->
+            <option value=""></option>
+            <!-- “All Classes” option -->
+            <option value="" {% if not selected_class_name %}selected{% endif %}>All Classes</option>
+            {% for cname in class_names %}
+              <option value="{{ cname }}" {% if cname == selected_class_name %}selected{% endif %}>
+                {{ cname }}
+              </option>
+            {% endfor %}
+          </select>
         </div>
-        
+
         <!-- Section filter -->
         <div class="class_section_filter_headings">
-            <h1 class="filters_headings">Section:</h1>
-            <select name="section" id="section_selection">
-                <option value="">Select Section</option>
-                <option value="A"> A</option>
-                <option value="B">B</option>
-                <option value="Girls">Girls</option>
-                <option value="Boys">Boys</option>
-                <option value="NONE">None</option>
-            </select>
+          <h1 class="filters_headings">Section:</h1>
+          <select name="section" id="section_selection">
+            <option value=""></option>
+            <option value="" {% if not selected_section %}selected{% endif %}>All Sections</option>
+            {% for sec in sections %}
+              <option value="{{ sec }}" {% if sec == selected_section %}selected{% endif %}>
+                {{ sec }}
+              </option>
+            {% endfor %}
+          </select>
         </div>
-        
-        <!-- Session filter -->
-        <div class="class_section_filter_headings">
-            <h1 class="filters_headings">Session:</h1>
-            <select name="session" id="session_selection">
-                <option value="">Select Session</option>
-                <option value="ST1-2025">ST1-2025</option>
-                <option value="ST1-2024">ST1-2024</option>
-                <option value="ST1-2023">ST1-2023</option>
-                <option value="FY1-2025">FY1-2025</option>
-                <option value="FY1-2024">FY1-2024</option>
-                <option value="FY1-2023">FY1-2023</option>
-            </select>
-        </div>
-        
-        <!-- Search -->
+
+        <!-- Search by student ID -->
         <div class="search_headings">
-            <div class="search-wrapper" id="searchWrapper">
-                <input type="text" class="search-input" placeholder="Search by ID, Name or Parent ID...">
-                <button class="search-button" id="searchButton">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                </button>
-            </div>
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="search_input"
+              name="search_id"
+              class="search-input"
+              placeholder="Search..."
+              value="{{ search_id }}">
+            <button class="search-button" type="submit" aria-label="Search">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none"
+                   xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        
+      </form>
     </section>
-    
-    <!-- Search Results -->
-    <div class="results-container">
-        <!-- Student 1 - Promoted -->
-        <div class="student-profile-card">
-            <div class="profile-header">
-                <div class="student-info">
-                    <div class="student-avatar">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <div class="student-details">
-                        <h2>Abuzar Hassan</h2>
-                        <p><strong>Student ID:</strong> FY1001</p>
-                        <p><strong>Parent ID:</strong> 42201-1234567-9</p>
-                        <p><strong>Current Class:</strong> STEP 3 (ST3-2025)</p>
-                    </div>
-                </div>
-                <div class="student-status">
-                    <span class="status-badge status-promoted">PROMOTED</span>
-                    <span class="status-badge">Active Student</span>
-                </div>
-            </div>
-            
-            <div class="academic-history">
-                <h3 class="history-heading">Academic Journey</h3>
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Academic Year</th>
-                            <th>Class</th>
-                            <th>Section</th>
-                            <th>Roll No</th>
-                            <th>Attendance</th>
-                            <th>Fee Status</th>
-                            <th>Result</th>
+
+    <!-- now displaying data of students according to filter and search -->
+    <section class="common_background record_founded_background">
+        <table class="table_founded_student table table-striped">
+            <thead>
+                <tr class="student_header">
+                    <th class="student_data">ID</th>
+                    <th class="student_data">Name</th>
+                    <th class="student_data">Class</th>
+                    <th class="student_data">Section</th>
+                    <th class="student_data">Session</th>
+                    <th class="student_data">Fee Status</th>
+                    <th class="student_data">Action</th>
+                </tr>
+            </thead>
+            <tbody class="table_body">
+                {% if students %}
+                    {% for s in students %}
+                        <tr class="table_body_row">
+                            <td class="table_body_data">{{ s.stud_id }}</td>
+                            <td class="table_body_data">{{ s.stud_name }}</td>
+                            <td class="table_body_data">
+                                <span class="badge bg-primary">{{ s.stud_class_name or '—' }}</span>
+                            </td>
+                            <td class="table_body_data">
+                                <span class="badge bg-info">{{ s.stud_class_section or 'NONE'}}</span>
+                            </td>
+                            <td class="table_body_data">{{ s.stud_class_session or '—'}}</td>
+                            <td class="table_body_data"><span class="badge bg-primary">{{ s.stud_fee_status}}</span></td> 
+                            <td class="view_btn">
+                              <div class="view_action-buttons">
+                                <a href="{{ url_for('view_left_student_details', student_id=s.stud_id) }}" class="view_btn_design">VIEW DETAILS</a>
+                              </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>FY1-2023</td>
-                            <td>Foundation Year 1</td>
-                            <td>NONE</td>
-                            <td>23</td>
-                            <td><span class="badge bg-success">94%</span></td>
-                            <td><span class="badge bg-success">Cleared</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>FY2-2024</td>
-                            <td>Foundation Year 2</td>
-                            <td>A</td>
-                            <td>15</td>
-                            <td><span class="badge bg-success">92%</span></td>
-                            <td><span class="badge bg-success">Cleared</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>ST1-2024</td>
-                            <td>STEP 1</td>
-                            <td>B</td>
-                            <td>18</td>
-                            <td><span class="badge bg-warning">85%</span></td>
-                            <td><span class="badge bg-warning">Partial</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>ST2-2025</td>
-                            <td>STEP 2</td>
-                            <td>Girls</td>
-                            <td>12</td>
-                            <td><span class="badge bg-success">91%</span></td>
-                            <td><span class="badge bg-success">Cleared</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>ST3-2025</td>
-                            <td>STEP 3</td>
-                            <td>Boys</td>
-                            <td>9</td>
-                            <td><span class="badge bg-success">93%</span></td>
-                            <td><span class="badge bg-warning">Partial</span></td>
-                            <td><span class="badge bg-primary">Current</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-export">
-                        <i class="fas fa-file-export"></i> Export to PDF
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Student 2 - Left School -->
-        <div class="student-profile-card">
-            <div class="profile-header">
-                <div class="student-info">
-                    <div class="student-avatar" style="border-color: #c62828;">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="student-details">
-                        <h2>Sara Khan</h2>
-                        <p><strong>Student ID:</strong> ST2005</p>
-                        <p><strong>Parent ID:</strong> 42201-7654321-3</p>
-                        <p><strong>Last Class:</strong> STEP 2 (ST2-2024)</p>
-                    </div>
-                </div>
-                <div class="student-status">
-                    <span class="status-badge status-left">LEFT SCHOOL</span>
-                    <span class="status-badge">Inactive Since: May 2024</span>
-                </div>
-            </div>
-            
-            <div class="academic-history">
-                <h3 class="history-heading">Academic Journey</h3>
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Academic Year</th>
-                            <th>Class</th>
-                            <th>Section</th>
-                            <th>Roll No</th>
-                            <th>Attendance</th>
-                            <th>Fee Status</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>FY1-2021</td>
-                            <td>Foundation Year 1</td>
-                            <td>NONE</td>
-                            <td>30</td>
-                            <td><span class="badge bg-warning">82%</span></td>
-                            <td><span class="badge bg-success">Cleared</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>FY2-2022</td>
-                            <td>Foundation Year 2</td>
-                            <td>A</td>
-                            <td>22</td>
-                            <td><span class="badge bg-warning">83%</span></td>
-                            <td><span class="badge bg-warning">Partial</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>FY3-2023</td>
-                            <td>Foundation Year 3</td>
-                            <td>B</td>
-                            <td>19</td>
-                            <td><span class="badge bg-warning">84%</span></td>
-                            <td><span class="badge bg-success">Cleared</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>ST1-2023</td>
-                            <td>STEP 1</td>
-                            <td>Girls</td>
-                            <td>15</td>
-                            <td><span class="badge bg-warning">79%</span></td>
-                            <td><span class="badge bg-danger">Pending</span></td>
-                            <td><span class="badge bg-primary">Promoted</span></td>
-                        </tr>
-                        <tr>
-                            <td>ST2-2024</td>
-                            <td>STEP 2</td>
-                            <td>Girls</td>
-                            <td>11</td>
-                            <td><span class="badge bg-danger">74%</span></td>
-                            <td><span class="badge bg-danger">Pending</span></td>
-                            <td><span class="badge bg-danger">Left School</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-print">
-                        <i class="fas fa-print"></i> Reset
-                    </button>
-                    <button class="btn btn-export">
-                        <i class="fas fa-file-export"></i> Export to PDF
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Empty State (Hidden by default) -->
-    <div class="empty-state" style="display: none;">
-        <i class="fas fa-search"></i>
-        <h3>No Records Found</h3>
-        <p>We couldn't find any student records matching your search criteria. Try adjusting your filters or search terms.</p>
-        <button class="btn btn-export" style="margin: 0 auto;">
-            <i class="fas fa-sync-alt"></i> Reset Filters
-        </button>
-    </div>
-    
-    <script>
-        // Search functionality
-        const searchWrapper = document.getElementById('searchWrapper');
-        const searchButton = document.getElementById('searchButton');
-        const searchInput = document.querySelector('.search-input');
-        
-        // Toggle search input visibility
-        searchButton.addEventListener('click', () => {
-            searchWrapper.classList.toggle('active');
-            if (searchWrapper.classList.contains('active')) {
-                searchInput.focus();
-            }
-        });
-        
-        // Close search when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!searchWrapper.contains(e.target)) {
-                searchWrapper.classList.remove('active');
-            }
-        });
-        
-        // Filter functionality
-        const classFilter = document.getElementById('class_selection');
-        const sectionFilter = document.getElementById('section_selection');
-        const sessionFilter = document.getElementById('session_selection');
-        
-        [classFilter, sectionFilter, sessionFilter].forEach(filter => {
-            filter.addEventListener('change', () => {
-                // In a real app, this would trigger an API call
-                // For this demo, we're just logging the values
-                console.log('Filters updated:');
-                console.log('Class:', classFilter.value);
-                console.log('Section:', sectionFilter.value);
-                console.log('Session:', sessionFilter.value);
-            });
-        });
-        
-        // Search input functionality
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                // Trigger search
-                console.log('Searching for:', searchInput.value);
-            }
-        });
-    </script>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No Records Found...</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </section>
 </body>
 </html>
