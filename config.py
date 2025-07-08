@@ -11,7 +11,7 @@ class Config:
     VECTOR_STORE_NAME: str = os.getenv("VECTOR_STORE", "vector_store")
     STUD_IMAGES_FOLDER_NAME: str = os.getenv("STUD_IMAGES_FOLDER_NAME", "student_images")
 
-    DEPARTURE_MINUTES = 1
+    DEPARTURE_MINUTES = 30
     FRAME_WIDTH, FRAME_HEIGHT = 640, 480
     FACE_MATCH_THRESHOLD = 0.60
     MODE_DISPLAY_DURATION= 3
