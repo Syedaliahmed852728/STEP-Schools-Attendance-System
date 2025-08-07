@@ -83,7 +83,7 @@
     </div>
 
     <section class="grid_cards">
-        <a href="{{ url_for('home') }}" class="glass_card" id="card-1">
+        <a href="{{ url_for('student_index') }}" class="glass_card" id="card-1">
             <span class="card_emoji">👨‍🎓</span>
             <h4 class="card_heading">Student Management</h4>
             <p class="card_para">Add, update, and remove students efficiently. Organized student data at your fingertips.</p>
@@ -136,8 +136,8 @@
         <!-- get news update section -->
     
     <section class="get_update">
-        <div class="get_news_img">{{ url_for('static', filename='web_images/news.png') }}
-            <img class="new_img" src="{{ url_for('static', filename='web_images/news.png') }}" alt="news">
+        <div class="get_news_img">
+            <img class="new_img" src="{{ url_for('static', filename='web_images/news.jpeg') }}" alt="news">
         </div>
         <div class="get_news_email">
             <h1 class="news_heading"> Get the latest updates</h1>

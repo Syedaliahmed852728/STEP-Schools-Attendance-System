@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="header">
-    <img id="logo_img"  src="../web_images/logo.png" alt="Logo">
+    <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
         <nav>
             <a class="top_menu" href="{{ url_for('home') }}">Home</a>
             <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
@@ -24,7 +24,9 @@
             
         </div>
   </header>
-
+       <div class="bg_btn">
+      <button id="bg_btn">Start</button>
+    </div>
   <section class="attendance_bg">
     <img src="{{ url_for('static', filename='web_images/bg.png') }}"
          class="bg_image" alt="Background">
@@ -33,9 +35,7 @@
     <img id="mode_img"
          src="{{ url_for('static', filename='web_images/mode0.png') }}"
          class="mode_overlay" alt="Mode">
-    <div class="bg_btn">
-      <button id="bg_btn">Start</button>
-    </div>
+
   </section>
 
   <section class="attendance_info">

@@ -85,14 +85,14 @@ class VectorStore:
 
 
 
+# archive_db_cursor
 
-
-with with_sql_cursor() as (conn, cur):
+with archive_db_cursor() as (conn, cur):
     # ensure you're using the Row factory (it sounds like you already are)
     conn.row_factory = sqlite3.Row  
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM attendance_table")
+    cur.execute("SELECT * FROM student_table")
     rows = cur.fetchall()
 
     for row in rows:

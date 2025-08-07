@@ -136,7 +136,7 @@ body{
 .bg_btn{
      display: flex;
     gap: 1rem;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
     padding: 1rem;
     margin-bottom: 1rem;

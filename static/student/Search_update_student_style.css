@@ -417,7 +417,7 @@ body{
     line-height: 35px;
     width: 120px;
     height: 45px;
-    background-color: rgb(192, 59, 59);
+    background-color: rgb(192, 59, 59) !important;
     border: 2px solid #2d2b6f ;
     border-radius: 10px;
     font-weight: bold;
