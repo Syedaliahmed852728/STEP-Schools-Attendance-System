@@ -14,7 +14,10 @@ class Config:
     DEPARTURE_MINUTES = 2
     FRAME_WIDTH, FRAME_HEIGHT = 640, 480
     FACE_MATCH_THRESHOLD = 0.60
-    MODE_DISPLAY_DURATION= 10
+    MODE_DISPLAY_DURATION= 3
+    IMAGEBACKGROUND = 'static/web_images/bg.png'
+    MODEFOLDERPATH = 'static/web_images/'
+
 
     STORAGE_PATH: Path = Path(os.getenv("STORAGE_PATH", "./data"))
     DB_NAME: str = os.getenv("DB_NAME", "STEP_SCHOOL_DB")

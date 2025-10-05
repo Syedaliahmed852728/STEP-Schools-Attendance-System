@@ -9,29 +9,24 @@
 </head>
 <body>
   <header class="header">
-    <!-- (your logo/nav/title markup here) -->
+    <!-- your logo/nav/title here -->
   </header>
 
   <section class="attendance_bg">
     <img src="{{ url_for('static', filename='web_images/bg.png') }}"
          class="bg_image" alt="Background">
-
     <img src="{{ url_for('video_feed') }}"
-         class="camera_overlay" alt="Live camera">
-
+         class="camera_overlay" alt="Camera">
     <img id="mode_img"
          src="{{ url_for('static', filename='web_images/mode0.png') }}"
          class="mode_overlay" alt="Mode">
-
     <div class="bg_btn">
       <button id="bg_btn">Start</button>
     </div>
   </section>
 
   <section class="attendance_info">
-    <h1 class="info_heading">
-      Face Recognition Attendance System
-    </h1>
+    <h1 class="info_heading">Face Recognition Attendance System</h1>
     <p class="info_para">
       Real‑time check‑in/out with logging and database updates.
     </p>
@@ -47,6 +42,7 @@
       modeSrc = new EventSource('/attendance/mode_feed');
       modeSrc.onmessage = e => {
         console.log('[SSE] mode →', e.data);
+        // this will now handle "mode1_temp" as well as "mode0", "mode3"
         modeImg.src = `/static/web_images/${e.data}.png`;
       };
       modeSrc.onerror = err => {
@@ -68,9 +64,7 @@
           .finally(() => btn.disabled = false);
       } else {
         fetch('/attendance/stop')
-          .then(resp => resp.text())
-          .then(txt => {
-            console.log(txt);
+          .then(() => {
             btn.textContent = 'Start';
             if (modeSrc) { modeSrc.close(); modeSrc = null; }
             modeImg.src = '/static/web_images/mode0.png';

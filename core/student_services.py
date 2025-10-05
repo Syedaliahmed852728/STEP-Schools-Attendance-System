@@ -1,10 +1,12 @@
 import cv2
+import pickle
 import logging
 import face_recognition
 from config import Config
 from utils import with_sql_cursor,archive_db_cursor ,VectorStore
 from pathlib import Path
 from core.class_services import get_all_classes
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -145,45 +147,87 @@ def get_all_students():
 
 
 def get_student(student_id: str):
-    query = """
-    WITH latest_fee AS (
-        SELECT 
-            stud_id, 
-            MAX(paid_data) AS max_paid_data
-        FROM fee_table
-        WHERE paid_data IS NOT NULL
-        GROUP BY stud_id
-    )
+    # 1️⃣ First, pull basic student, class, parent info (no fee status here)
+    student_detail_query = """
     SELECT
-        s.stud_id AS stud_id,
-        s.stud_name AS stud_name,
-        c.class_name AS stud_class_name,
-        c.section AS stud_class_section,
-        c.session AS stud_class_session,
-        p.parent_id AS stud_parent_id,
-        p.parent_name AS stud_parent_name,
-        p.parent_contact_number AS stud_parent_contact_number,
-        f.status AS stud_fee_status
+        s.stud_id,
+        s.stud_name,
+        c.class_name    AS stud_class_name,
+        c.section       AS stud_class_section,
+        c.session       AS stud_class_session,
+        p.parent_id     AS stud_parent_id,
+        p.parent_name   AS stud_parent_name,
+        p.parent_contact_number AS stud_parent_contact_number
     FROM student_table AS s
-    LEFT JOIN class_table AS c
-        ON s.class_id = c.class_id
-    LEFT JOIN parent_table AS p
-        ON s.parent_id = p.parent_id
-    LEFT JOIN latest_fee AS lf
-        ON s.stud_id = lf.stud_id
-    LEFT JOIN fee_table AS f
-        ON f.stud_id = lf.stud_id
-       AND f.paid_data = lf.max_paid_data
+    LEFT JOIN class_table   AS c ON s.class_id   = c.class_id
+    LEFT JOIN parent_table  AS p ON s.parent_id  = p.parent_id
     WHERE s.stud_id = ?
-    LIMIT 1
-    ;
+    LIMIT 1;
     """
+
     with with_sql_cursor() as (_, cur):
-        cur.execute(query, (student_id,))
+        cur.execute(student_detail_query, (student_id,))
         row = cur.fetchone()
-    if row is None:
-        return None
-    
+        if not row:
+            return None
+
+        # 2️⃣ Attendance stats
+        cur.execute(
+            "SELECT COUNT(*) FROM attendance_table WHERE stud_id = ? AND status = 'Present'",
+            (student_id,)
+        )
+        present_count = cur.fetchone()[0] or 0
+
+        cur.execute(
+            "SELECT COUNT(*) FROM attendance_table WHERE stud_id = ? AND status != 'Off'",
+            (student_id,)
+        )
+        total_days = cur.fetchone()[0] or 0
+
+        percentage = (present_count / total_days * 100) if total_days > 0 else 0.0
+
+        # 3️⃣ Attendance history (last 30 records)
+        cur.execute("""
+            SELECT date_full, status, arrival_time, departure_time
+            FROM attendance_table
+            WHERE stud_id = ?
+            ORDER BY date_full DESC
+            LIMIT 30
+        """, (student_id,))
+        attendance_history = cur.fetchall()
+
+        # 4️⃣ Fee histories
+        cur.execute("""
+            SELECT challan_no, paid_data, status, month_name, amount
+            FROM fee_table
+            WHERE stud_id = ?
+            ORDER BY paid_data DESC
+            LIMIT 10
+        """, (student_id,))
+        current_class_fees = cur.fetchall()
+
+        cur.execute("""
+            SELECT challan_no, paid_data, status, month_name, amount, stud_id
+            FROM fee_table
+            WHERE stud_id = ?
+            ORDER BY paid_data DESC
+        """, (student_id,))
+        complete_fee_history = cur.fetchall()
+
+        # 5️⃣ Now, override the fee status to reflect *this month*:
+        current_month = datetime.now().strftime("%B %Y")   # e.g. "July 2025"
+        cur.execute(
+            "SELECT status FROM fee_table WHERE stud_id = ? AND month_name = ?",
+            (student_id, current_month)
+        )
+        fee_row = cur.fetchone()
+        if fee_row and fee_row["status"] == "Paid":
+            fee_status = "Paid"
+        else:
+            # either no record for this month, or not paid
+            # optionally, you could even INSERT a default “Unpaid” row here
+            fee_status = "Unpaid"
+
     return {
         "stud_id": row["stud_id"],
         "stud_name": row["stud_name"],
@@ -193,66 +237,62 @@ def get_student(student_id: str):
         "stud_parent_id": row["stud_parent_id"],
         "stud_parent_name": row["stud_parent_name"],
         "stud_parent_contact_number": row["stud_parent_contact_number"],
-        "stud_fee_status": row["stud_fee_status"],
+        "stud_fee_status": fee_status,
+        "total_attendance": present_count,
+        "total_days": total_days,
+        "attendance_percentage": round(percentage, 2),
+        "attendance_history": attendance_history,
+        "current_class_fees": current_class_fees,
+        "complete_fee_history": complete_fee_history
     }
 
 
 def prepare_student_index_data(with_sql_cursor, args) -> dict:
     """
     Gather data for the student index template based on request args.
-    - get_all_classes: callable returning list of class dicts.
-    - with_sql_cursor: context manager for database access.
-    - args: request.args or a dict-like with keys "class_name", "section", "search_id".
-    Returns a dict with:
-      - class_names: sorted list of distinct class_name
-      - sections: set of section values (possibly including None or "")
-      - students: list of student dicts from DB
-      - selected_class_name, selected_section, search_id: cleaned strings
     """
     # 1. Load all classes and distinct class names
-    classes_data = get_all_classes()
-    class_names = sorted({cls["class_name"] for cls in classes_data if cls.get("class_name")})
+    classes_data     = get_all_classes()
+    class_names      = sorted({cls["class_name"] for cls in classes_data if cls.get("class_name")})
 
-    # 2. Extract and clean filters from args
-    selected_class_name = args.get("class_name", default="", type=str).strip() if hasattr(args, 'get') else str(args.get("class_name", "")).strip()
-    selected_section = args.get("section", default="", type=str).strip() if hasattr(args, 'get') else str(args.get("section", "")).strip()
-    search_id = args.get("search_id", default="", type=str).strip() if hasattr(args, 'get') else str(args.get("search_id", "")).strip()
-
-    # 3. Build section_values based on selected_class_name
-    section_values: set = set()
-    if selected_class_name:
-        for cls in classes_data:
-            if cls.get("class_name") == selected_class_name:
-                sec = cls.get("section", None)
-                section_values.add(sec)
+    # 2. Extract filters
+    if hasattr(args, 'get'):
+        selected_class_name = args.get("class_name", "", type=str).strip()
+        selected_section    = args.get("section",    "", type=str).strip()
+        search_id           = args.get("search_id",  "", type=str).strip()
     else:
-        for cls in classes_data:
-            sec = cls.get("section", None)
-            section_values.add(sec)
+        selected_class_name = str(args.get("class_name", "")).strip()
+        selected_section    = str(args.get("section",    "")).strip()
+        search_id           = str(args.get("search_id",  "")).strip()
 
-    # 4. Build SQL query with latest_fee CTE
+    # 3. Build section values
+    section_values = set()
+    for cls in classes_data:
+        if not selected_class_name or cls.get("class_name") == selected_class_name:
+            section_values.add(cls.get("section") or "")
+
+    # 4. Base SQL with latest_fee CTE (for historical lookup, but we'll override below)
     query = """
     WITH latest_fee AS (
-        SELECT stud_id, MAX(paid_data) AS max_paid_data
-        FROM fee_table
-        WHERE paid_data IS NOT NULL
-        GROUP BY stud_id
+      SELECT stud_id, MAX(paid_data) AS max_paid_data
+      FROM fee_table
+      WHERE paid_data IS NOT NULL
+      GROUP BY stud_id
     )
     SELECT
-        s.stud_id AS stud_id,
-        s.stud_name AS stud_name,
-        c.class_name AS stud_class_name,
-        c.section    AS stud_class_section,
-        c.session    AS stud_class_session,
-        f.status     AS stud_fee_status
+      s.stud_id             AS stud_id,
+      s.stud_name           AS stud_name,
+      c.class_name          AS stud_class_name,
+      c.section             AS stud_class_section,
+      c.session             AS stud_class_session,
+      f.status              AS stud_fee_status
     FROM student_table s
-    LEFT JOIN class_table c ON s.class_id = c.class_id
-    LEFT JOIN latest_fee lf ON s.stud_id = lf.stud_id
-    LEFT JOIN fee_table f
-      ON f.stud_id = lf.stud_id AND f.paid_data = lf.max_paid_data
+    LEFT JOIN class_table   c ON s.class_id = c.class_id
+    LEFT JOIN latest_fee    lf ON s.stud_id = lf.stud_id
+    LEFT JOIN fee_table     f  ON f.stud_id = lf.stud_id
+                           AND f.paid_data = lf.max_paid_data
     """
-    filters = []
-    params: dict = {}
+    filters, params = [], {}
     if selected_class_name:
         filters.append("c.class_name = :class_name")
         params["class_name"] = selected_class_name
@@ -270,19 +310,35 @@ def prepare_student_index_data(with_sql_cursor, args) -> dict:
         query += " WHERE " + " AND ".join(filters)
     query += " ORDER BY s.stud_name COLLATE NOCASE"
 
-    # 5. Execute query
+    # 5. Fetch base student records
     with with_sql_cursor() as (_, cur):
         cur.execute(query, params)
         rows = cur.fetchall()
-    students = [dict(r) for r in rows]
+
+        students = [dict(r) for r in rows]
+
+        # 6. Determine this month string
+        current_month = datetime.now().strftime("%B %Y")  # e.g. "July 2025"
+
+        # 7. For each student, override stud_fee_status based on this month
+        for stu in students:
+            cur.execute(
+                "SELECT status FROM fee_table WHERE stud_id = ? AND month_name = ?",
+                (stu["stud_id"], current_month)
+            )
+            fee_row = cur.fetchone()
+            if fee_row and fee_row["status"] == "Paid":
+                stu["stud_fee_status"] = "Paid"
+            else:
+                stu["stud_fee_status"] = "Unpaid"
 
     return {
-        "class_names": class_names,
-        "sections": section_values,
-        "students": students,
-        "selected_class_name": selected_class_name,
-        "selected_section": selected_section,
-        "search_id": search_id,
+        "class_names":          class_names,
+        "sections":             section_values,
+        "students":             students,
+        "selected_class_name":  selected_class_name,
+        "selected_section":     selected_section,
+        "search_id":            search_id,
     }
 
 
@@ -413,6 +469,26 @@ def permanent_delete_student(stud_id):
                     (class_id,)
                 )
                 logger.info(f"Deleted class {class_id} as no more students reference it")
+    if vector_store.exists(stud_id):
+        store = vector_store.all()
+        del store[stud_id]
+        vector_store._store = store  # Update internal reference
+        try:
+            with open(vector_store.path, 'wb') as f:
+                pickle.dump(store, f)
+            logger.info(f"Deleted embedding for student {stud_id}")
+        except Exception as e:
+            logger.error(f"Failed to delete embedding for student {stud_id}: {e}")
+
+    images_dir = Path(Config.STUD_IMAGES_FILE)
+    for ext in ('.jpg', '.jpeg', '.png'):
+        img_path = images_dir / f"{stud_id}{ext}"
+        if img_path.exists():
+            try:
+                img_path.unlink()
+                logger.info(f"Deleted image file {img_path}")
+            except Exception as e:
+                logger.error(f"Failed to delete image file {img_path}: {e}")
 
 
 def mark_left_student(stud_id: str):

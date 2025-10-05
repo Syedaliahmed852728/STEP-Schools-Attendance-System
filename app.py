@@ -15,7 +15,9 @@ from werkzeug.utils import secure_filename
 from config import Config
 import logging
 from pathlib import Path
+from PIL import Image
 import cv2
+import io
 import threading
 from core.attendance_services import (
     start_attendance_loop,
@@ -59,27 +61,36 @@ def add_student():
         except Exception as e:
             logger.error(f"Failed to create images directory: {e}")
 
-    if 'image' in request.files:
-        file = request.files['image']
-        if file and file.filename:
-            # Secure the filename and extract its extension
-            filename = secure_filename(file.filename)
-            _, ext = os.path.splitext(filename)  # e.g. ".png" or ".jpg"
-            ext = ext.lower()
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                _, ext = os.path.splitext(filename)
+                ext = ext.lower()
 
-            # Build the target path: <STUD_IMAGES_FILE>/<stud_id><ext>
-            target_path = images_base / f"{stud_id}{ext}"
+                # Build the target path
+                target_path = images_base / f"{stud_id}{ext}"
 
-            if target_path.exists():
-                # Already have an image with this name/extension:
-                img_path = target_path
-            else:
-                # First‐time upload: save the file
                 try:
-                    file.save(str(target_path))
+                    # 1) Load the incoming image data into PIL
+                    img_stream = file.read()
+                    pil_img = Image.open(io.BytesIO(img_stream))
+                    pil_img = pil_img.convert("RGB")  # ensure 3‑channel
+
+                    # 2) Compute new size: height = 458, width scaled
+                    new_height = 458
+                    w, h = pil_img.size
+                    new_width = int(w * new_height / h)
+
+                    # 3) Resize with high‑quality filter
+                    pil_resized = pil_img.resize((new_width, new_height), Image.LANCZOS)
+
+                    # 4) Save to disk
+                    pil_resized.save(str(target_path), format="JPEG", quality=90)
                     img_path = target_path
+
                 except Exception as e:
-                    flash(f"Failed to save uploaded image: {e}", 'warning')
+                    flash(f"Failed to save/rescale image: {e}", 'warning')
                     img_path = None
 
         try:
@@ -156,14 +167,13 @@ def update_student(student_id):
         if file and file.filename:
             # Secure the filename and get its extension
             filename = secure_filename(file.filename)
-            _, ext = os.path.splitext(filename)  # e.g. ".png", ".jpg", etc.
+            _, ext = os.path.splitext(filename)  # e.g. ".png", ".jpg"
             ext = ext.lower()
 
-            # Build the new target path: <STUD_IMAGES_FILE>/<stud_id><ext>
             images_base: Path = Path(Config.STUD_IMAGES_FILE)
             target_path = images_base / f"{stud_id}{ext}"
 
-            # (Optional) Remove any old image for this student with a different ext
+            # Remove any old image variants for this student
             for old in images_base.glob(f"{stud_id}.*"):
                 if old != target_path:
                     try:
@@ -171,12 +181,28 @@ def update_student(student_id):
                     except Exception as e:
                         logger.warning(f"Could not remove old image {old}: {e}")
 
-            # Save (this will overwrite if the same filename already exists)
             try:
-                file.save(str(target_path))
+                # Read the uploaded file into PIL
+                data = file.read()
+                pil_img = Image.open(io.BytesIO(data)).convert("RGB")
+
+                # Compute new size: height fixed at 458px
+                new_height = 458
+                w, h = pil_img.size
+                new_width = int(w * new_height / h)
+
+                # Resize with high-quality filter
+                pil_resized = pil_img.resize((new_width, new_height), Image.LANCZOS)
+
+                # Ensure directory exists
+                images_base.mkdir(parents=True, exist_ok=True)
+
+                # Save resized image
+                pil_resized.save(str(target_path), format="JPEG", quality=90)
                 img_path = target_path
+
             except Exception as e:
-                flash(f"Failed to save uploaded image: {e}", 'warning')
+                flash(f"Failed to save/rescale image: {e}", 'warning')
                 img_path = None
 
         try:
@@ -281,7 +307,6 @@ def fee_delete(fee_id):
     if not delete_fee_record(fee_id):
         abort(404)
     return ("", 204)
-
 
 
 @app.route("/attendance")

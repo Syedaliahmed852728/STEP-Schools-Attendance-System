@@ -152,7 +152,7 @@
                                 <span class="badge bg-info">{{ s.stud_class_section or 'NONE'}}</span>
                             </td>
                             <td class="table_body_data">{{ s.stud_class_session or '—'}}</td>
-                            <td class="table_body_data"><span class="badge bg-primary">{{ s.stud_fee_status or '—'  }}</span></td> 
+                            <td class="table_body_data"><span class="badge bg-primary">{{ s.stud_fee_status or 'Unpaid'  }}</span></td> 
                             <td class="edit_btn">
                               <div class="edit_action-buttons">
                                 <a href="{{ url_for('update_student', student_id=s.stud_id) }}" class="edit_btn_design">EDIT</a>

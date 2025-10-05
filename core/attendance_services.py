@@ -11,6 +11,7 @@ from utils import with_sql_cursor, VectorStore
 from pathlib import Path
 from config import Config
 from datetime import datetime, timedelta
+from core.student_services import get_student
 
 # ─── Logging setup ────────────────────────────────────────────────────────────
 logger = logging.getLogger("attendance")
@@ -160,7 +161,7 @@ def _attendance_capture_loop():
 
     current_mode = 0
     mode_time    = None
-
+    mode1_base = cv2.imread(str(Path("static/web_images/mode1.png")))
     while True:
         with _camera_lock:
             if not _camera_running:
@@ -174,10 +175,80 @@ def _attendance_capture_loop():
         now = time.time()
 
         if sid and event == 'new':
-            logger.debug(f"Event NEW for {sid}")
+            # 1) Mark attendance
             MarkAttendance(sid)
-            _mode_q.put('mode1')
+
+            # 2) Fetch student info + headshot
+            info = get_student(student_id=sid)
+            headshot = None
+            for ext in ('.jpg','.jpeg','.png'):
+                p = Path(Config.STUD_IMAGES_FILE) / f"{sid}{ext}"
+                if p.exists():
+                    headshot = cv2.imread(str(p))
+                    break
+
+            # 3) Compose the dynamic mode1 panel
+            panel = mode1_base.copy()
+
+            # — top‑center headshot: width -5px, height -10px, moved down +10px
+            base_w, base_h = 200, 200
+            pw = base_w      # 195px wide
+            ph = base_h - 10     # 190px tall
+            x_photo = (panel.shape[1] - pw) // 2
+            y_photo = 60 + 60    # originally 60 + 50; now +10 more =110 → 120 total
+            if headshot is not None:
+                face = cv2.resize(headshot, (pw, ph))
+                panel[y_photo:y_photo+ph, x_photo:x_photo+pw] = face
+
+            # — top‑left total attendance: smaller text, moved down +15px
+            total = info["total_attendance"]
+            cv2.putText(
+                panel,
+                str(total),
+                (20, 55),                    # 40→55
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.0,                         # reduced from 1.2 → 1.0
+                (255,255,255),
+                2
+            )
+
+            # — remove literal “ID:”/“Major:” but still draw their VALUES
+            cv2.putText(
+                panel,
+                info['stud_id'],
+                (panel.shape[1]//2 - 100, 430),
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.0,
+                (255,255,255),
+                2
+            )
+            cv2.putText(
+                panel,
+                info['stud_class_name'],
+                (panel.shape[1]//2 - 100, 480),
+                cv2.FONT_HERSHEY_DUPLEX,
+                1.0,
+                (255,255,255),
+                2
+            )
+
+            # 4) Save dynamic panel
+            tmp = Path("static/web_images/mode1_temp.png")
+            cv2.imwrite(str(tmp), panel)
+
+            # 5) Queue it
+            _mode_q.put("mode1_temp")
             current_mode, mode_time = 1, now
+
+            # 6) Hold for duration
+            time.sleep(Config.MODE_DISPLAY_DURATION)
+
+            # 7) Reset
+            _mode_q.put("mode0")
+            current_mode, mode_time = 0, None
+            continue
+
+
 
         elif sid and event == 'departure':
             logger.debug(f"Event DEPARTURE for {sid}")

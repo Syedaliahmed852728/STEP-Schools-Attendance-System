@@ -154,7 +154,7 @@
                                 <span class="badge bg-info">{{ s.stud_class_section or 'NONE'}}</span>
                             </td>
                             <td class="table_body_data">{{ s.stud_class_session or '—'}}</td>
-                            <td class="table_body_data"><span class="badge bg-primary">{{ s.stud_fee_status or '—'  }}</span></td> 
+                            <td class="table_body_data"><span class="badge bg-primary">{{ s.stud_fee_status}}</span></td> 
                             <td class="view_btn">
                               <div class="view_action-buttons">
                                 <a href="{{ url_for('view_student_details', student_id=s.stud_id) }}" class="view_btn_design">VIEW DETAILS</a>

@@ -7,8 +7,8 @@ import datetime
 
 def prepare_fee_management_data(with_sql_cursor, args) -> dict:
     # 1. load classes & build class/section lists exactly like student index
-    classes_data = get_all_classes()
-    class_names = sorted({cls["class_name"] for cls in classes_data if cls.get("class_name")})
+    classes_data      = get_all_classes()
+    class_names       = sorted({cls["class_name"] for cls in classes_data if cls.get("class_name")})
 
     selected_class_name = args.get("class_name", "").strip()
     selected_section    = args.get("section",    "").strip()
@@ -21,10 +21,10 @@ def prepare_fee_management_data(with_sql_cursor, args) -> dict:
         if not selected_class_name or cls["class_name"] == selected_class_name:
             section_values.add(cls.get("section") or "")
 
-    # possible fee statuses (could also fetch DISTINCT(status) from fee_table)
+    # possible fee statuses
     statuses = ["Unpaid", "Paid", "Overdue"]
 
-    # 2. SQL — pull each student + their latest fee row
+    # 2. SQL — pull each student + their latest fee row (for historical context)
     query = """
     WITH latest_fee AS (
       SELECT stud_id, MAX(paid_data) AS max_paid_data
@@ -35,19 +35,17 @@ def prepare_fee_management_data(with_sql_cursor, args) -> dict:
     SELECT
       s.stud_id,
       s.stud_name,
-      c.class_name   AS stud_class_name,
-      c.section      AS stud_class_section,
-      c.session      AS stud_class_session,
-      f.status       AS stud_fee_status
+      c.class_name            AS stud_class_name,
+      c.section               AS stud_class_section,
+      c.session               AS stud_class_session,
+      f.status                AS stud_fee_status
     FROM student_table s
-    LEFT JOIN class_table   c ON s.class_id = c.class_id
+    LEFT JOIN class_table   c  ON s.class_id = c.class_id
     LEFT JOIN latest_fee    lf ON s.stud_id = lf.stud_id
     LEFT JOIN fee_table     f  ON f.stud_id = lf.stud_id
-                            AND f.paid_data = lf.max_paid_data
+                             AND f.paid_data = lf.max_paid_data
     """
-
-    filters = []
-    params  = {}
+    filters, params = [], {}
     if selected_class_name:
         filters.append("c.class_name = :class_name")
         params["class_name"] = selected_class_name
@@ -58,6 +56,7 @@ def prepare_fee_management_data(with_sql_cursor, args) -> dict:
             filters.append("c.section = :section")
             params["section"] = selected_section
     if selected_status:
+        # we'll override below, but allow filtering by historical status if desired
         filters.append("f.status = :status")
         params["status"] = selected_status
     if search_id:
@@ -66,24 +65,40 @@ def prepare_fee_management_data(with_sql_cursor, args) -> dict:
 
     if filters:
         query += " WHERE " + " AND ".join(filters)
-
     query += " ORDER BY s.stud_name COLLATE NOCASE"
 
+    # 3. execute and post‐process
     with with_sql_cursor() as (_, cur):
         cur.execute(query, params)
         rows = cur.fetchall()
-    students = [dict(r) for r in rows]
+        students = [dict(r) for r in rows]
+ 
+        # determine the current month label
+        current_month = datetime.datetime.now().strftime("%B %Y")  # e.g. "July 2025"
+
+        # override each student's fee status based on THIS month
+        for stu in students:
+            cur.execute(
+                "SELECT status FROM fee_table WHERE stud_id = ? AND month_name = ?",
+                (stu["stud_id"], current_month)
+            )
+            fee_row = cur.fetchone()
+            if fee_row and fee_row["status"] == "Paid":
+                stu["stud_fee_status"] = "Paid"
+            else:
+                stu["stud_fee_status"] = "Unpaid"
 
     return {
-        "class_names": class_names,
-        "sections": section_values,
-        "statuses": statuses,
-        "students": students,
-        "selected_class_name": selected_class_name,
-        "selected_section": selected_section,
-        "selected_status": selected_status,
-        "search_id": search_id,
+        "class_names":          class_names,
+        "sections":             section_values,
+        "statuses":             statuses,
+        "students":             students,
+        "selected_class_name":  selected_class_name,
+        "selected_section":     selected_section,
+        "selected_status":      selected_status,
+        "search_id":            search_id,
     }
+
 
 def add_fee_record(
     stud_id: str,

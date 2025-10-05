@@ -8,65 +8,56 @@
     <title>view student details</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap JS (for certain components like modals, dropdowns) -->
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-        <header class="header">
-        <img id="logo_img"  src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
-        <nav>
-            <a class="top_menu" href="{{ url_for('home') }}">Home</a>
-            <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
-            <a class="top_menu" href="../classes/class_manage.html">Classes</a>
-            <a class="top_menu" target="_blank" href="../Attendance/attendance_index.html">Attendance</a>
-            <a class="top_menu" href="../fee/fee_management.html">Fee</a>
-            <a class="top_menu" href="../history/history.html">History</a>
-        </nav>
-        <div class="title">
-            <h1 id="title_name_heading">STEP Schools</h1>
-            <p id="title_name_city">Talagang</p>
-            
-        </div>
+<header class="header">
+    <img id="logo_img" src="{{ url_for('static', filename='web_images/logo.png') }}" alt="Logo">
+    <nav>
+        <a class="top_menu" href="{{ url_for('home') }}">Home</a>
+        <a class="top_menu" href="{{ url_for('student_index') }}">Students</a>
+        <a class="top_menu" href="../classes/class_manage.html">Classes</a>
+        <a class="top_menu" href="../Attendance/attendance_index.html">Attendance</a>
+        <a class="top_menu" href="../fee/fee_management.html">Fee</a>
+        <a class="top_menu" href="../history/history.html">History</a>
+    </nav>
+    <div class="title">
+        <h1 id="title_name_heading">STEP Schools</h1>
+        <p id="title_name_city">Talagang</p>
+    </div>
+    <div class="menu_image">
+        <img class="Menu-option-image" src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
+    </div>
+</header>
 
-        <div class="menu_image">
-        <img class="Menu-option-image"  src="{{ url_for('static', filename='web_images/menu.png') }}" alt="Menu-option">
-        </div>
-    
-    </header>
-    <section class="main_Container">
-       <div class="main_heading" >
+<section class="main_Container">
+    <div class="main_heading">
         <h1 class="static_txt">Student</h1>
         <h1 class="dynamic_txt">Management</h1>
-       </div>
-    </section>
-    <menu class="Stud_menu">
-     
-        <a href="{{ url_for('add_student') }}" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/add.png') }}" alt="Add Student">
-        <span class="text_menu">Add Student</span>
-        </a>
-     
-        <a href="Search_update_student.html" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/update.png') }}" alt="update Student">
-        <span class="text_menu">Update Student</span>
-        </a>
+    </div>
+</section>
 
-         <a href="delete_student.html" class="menu_desig">
-        <img class="icon_menu"  src="{{ url_for('static', filename='web_images/delete.png') }}" alt="Delete Student">
+<menu class="Stud_menu">
+    <a href="{{ url_for('add_student') }}" class="menu_desig">
+        <img class="icon_menu" src="{{ url_for('static', filename='web_images/add.png') }}" alt="Add Student">
+        <span class="text_menu">Add Student</span>
+    </a>
+    <a href="Search_update_student.html" class="menu_desig">
+        <img class="icon_menu" src="{{ url_for('static', filename='web_images/update.png') }}" alt="Update Student">
+        <span class="text_menu">Update Student</span>
+    </a>
+    <a href="delete_student.html" class="menu_desig">
+        <img class="icon_menu" src="{{ url_for('static', filename='web_images/delete.png') }}" alt="Delete Student">
         <span class="text_menu">Delete Student</span>
-        </a>
-    </menu>
-    <div class="container position-relative">
-    <!-- Animated Header with Close Button -->
+    </a>
+</menu>
+
+<div class="container position-relative">
     <div class="header-wrapper text-center mb-5">
-        <a href="{{ url_for('student_index') }}" 
-           class="close-btn hover-grow" 
-           aria-label="Close dashboard">
+        <a href="{{ url_for('student_index') }}" class="close-btn hover-grow" aria-label="Close dashboard">
             <span class="cross-icon">x</span>
         </a>
-        
         <h2 class="main-heading">
             <span class="gradient-text">Student Academic Profile</span>
             <div class="heading-underline"></div>
@@ -74,38 +65,23 @@
         <p class="sub-heading text-muted">Comprehensive Academic Record & Export Portal</p>
     </div>
 
-        
- 
-    <!-- backend logic for that specific student will display whose id and user click to view details btn -->
-    <!-- Updated Profile Card without Image -->
     <div class="profile-card glassmorphic-card">
         <div class="card-body">
             <div class="row">
-                <!-- Profile Info Section -->
                 <div class="col-md-4 text-center profile-section">
                     <div class="info-container">
                         <h3 class="profile-name">{{ student.stud_name }}</h3>
                         <div class="student-id">{{ student.stud_id }}</div>
-                        <div class="status-badge {% if student.left_status %}left-status{% else %}active-status{% endif %}" role="status">
-                            <!-- {{ 'Left' if student.left_status else 'Active' }} -->
-                              <!-- for now i m writing status active -->
-                               Active
-                        </div>
-                        
-                        <!-- Image Path Display -->
+                        <div class="status-badge active-status" role="status">Active</div>
                         <div class="image-path-container mt-4 p-3">
                             <div class="path-label">📁 Image Path:</div>
                             <div class="path-value text-muted">
-                                <!-- {{ student.image_path or 'No image available' }} -->
-                                  <!-- here to display both image path and if not then display no avalible image -->
-                                   <!-- for now i m writing no image -->
-                                    No Available path
+                                {{ student.image_path if student.image_path else 'No Available path' }}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Academic Details Section -->
                 <div class="col-md-8 academic-details">
                     <div class="detail-section">
                         <h4 class="section-title">Academic Timeline</h4>
@@ -113,251 +89,108 @@
                             <div class="col-md-6">
                                 <div class="detail-card">
                                     <label class="detail-label">📅 FEE Status</label>
-                                    <!-- display current month fee status -->
-                                    <p class="detail-value">{{ student.stud_fee_status }}</p>
+                                    <p class="detail-value">{{ student.stud_fee_status or 'Unpaid'}}</p>
                                 </div>
                                 <div class="detail-card">
-                                <a href="#feeModal" class="clickable-card">
-                                <label class="detail-label">⏳ Fee Details</label>
-                                <p class="detail-value">Click to view payment history</p>
-                                </a>
-
+                                    <label class="detail-label">✔ Attendance Percentage</label>
+                                    <p class="detail-value">{{ student.attendance_percentage }}%</p>
                                 </div>
-                                <!-- Modified Fee Details Card (make it clickable) -->
-                                
-                                 <!-- Fee Modal Structure -->
-                                <div id="feeModal" class="fee-modal">
-                                <div class="modal-content glassmorphic-card">
-                                    <a href="view_Student_details.html" class="close-btn">×</a>
-                                    <h3 class="gradient-text">Fee Payment History</h3>
-                                    
-                                    <div class="tabs">
-                                        <input type="radio" name="tab" id="current-class" checked>
-                                        <label for="current-class" class="tab-label">Current Class</label>
-                                        <input type="radio" name="tab" id="complete-history">
-                                        <label for="complete-history" class="tab-label">Complete History</label>
-
-                                        <!-- Current Class Tab -->
-                                        <div class="tab-content current-class">
-                                            <table class="fee-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Challan No.</th>
-                                                        <th>Paid Date</th>
-                                                        <th>Status</th>
-                                                        <th>Month</th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <!-- Sample Data -->
-                                                    <tr>
-                                                        <td>CH-2023-001</td>
-                                                        <td>2023-10-05</td>
-                                                        <td><span class="badge bg-success">Paid</span></td>
-                                                        <td>October 2023</td>
-                                                        <td>₹2500</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <button class="btn-gradient">
-                                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                                                Export Current Class
-                                            </button>
-                                        </div>
-
-                                        <!-- Complete History Tab -->
-                                        <div class="tab-content complete-history">
-                                            <table class="fee-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Challan No.</th>
-                                                        <th>Paid Date</th>
-                                                        <th>Status</th>
-                                                        <th>Month</th>
-                                                        <th>Class</th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <!-- Sample Data -->
-                                                    <tr>
-                                                        <td>CH-2023-001</td>
-                                                        <td>2023-10-05</td>
-                                                        <td><span class="badge bg-success">Paid</span></td>
-                                                        <td>October 2023</td>
-                                                        <td>Foundation 1</td>
-                                                        <td>₹2500</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <button class="btn-gradient">
-                                                <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                                                Export Complete History
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="detail-card">
                                     <label class="detail-label">🏫 Current Class</label>
-                                    <!-- logic to display that class -->
                                     <p class="detail-value">{{ student.stud_class_name }}</p>
                                 </div>
                                 <div class="detail-card">
                                     <label class="detail-label">📚 Section</label>
-                                    <!-- logic student section and lets say no section is selected then display 'none'-->
                                     <p class="detail-value">{{ student.stud_class_section or 'None' }}</p>
                                 </div>
                                 <div class="detail-card">
                                     <label class="detail-label">📚 Session</label>
-                                    <!-- logic student section and lets say no section is selected then display 'none'-->
-                                    <p class="detail-value">{{ student.stud_class_session}}</p>
+                                    <p class="detail-value">{{ student.stud_class_session }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Attendance Progress -->
-<div class="progress-section">
-    <h4 class="section-title">Attendance Overview</h4>
-    <div class="attendance-progress" role="progressbar" 
-         aria-valuenow="75" 
-         aria-valuemin="0" 
-         aria-valuemax="100">
-        <div class="progress-bar" 
-             style="width: 75%;" 
-             data-percent="75">
-            <span class="progress-text">75%</span>
-        </div>
-        <div class="attendance-stats mt-2">
-            <div class="stat-present">
-                <i class="bi bi-check-circle-fill text-success me-1"></i>
-                3 Present
-            </div>
-            <div class="stat-absent">
-                <i class="bi bi-x-circle-fill text-danger me-1"></i>
-                1 Absent
+                    <div class="progress-section">
+                        <h4 class="section-title">Attendance Overview</h4>
+                        <div class="attendance-progress" role="progressbar" aria-valuenow="{{ student.attendance_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar" style="width: {{ student.attendance_percentage }}%;" data-percent="{{ student.attendance_percentage }}">
+                                <span class="progress-text">{{ student.attendance_percentage }}%</span>
+                            </div>
+                        </div>
+                        <div class="attendance-stats mt-2">
+                            <div class="stat-present">
+                                <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                {{ student.total_attendance }} Present
+                            </div>
+                            <div class="stat-absent">
+                                <i class="bi bi-x-circle-fill text-danger me-1"></i>
+                                {{ student.total_days - student.total_attendance }} Absent
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guardian-info mt-4">
+                        <h4 class="section-title">📌 Guardian Details</h4>
+                        <div class="detail-card elevated-card p-3">
+                            <div class="guardian-name mb-2">
+                                <i class="bi bi-person-badge-fill me-2"></i>
+                                {{ student.stud_parent_name }}
+                            </div>
+                            <div class="guardian-contact mb-2">
+                                <i class="bi bi-telephone-fill me-2"></i>
+                                {{ student.stud_parent_contact_number }}
+                            </div>
+                            <div class="guardian-cnic">
+                                <i class="bi bi-credit-card-2-front-fill me-2"></i>
+                                {{ student.stud_parent_id }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="attendance-history mt-5">
+                        <div class="history-header text-center">
+                            <h4 class="section-title">
+                                <i class="bi bi-clock-history"></i> Attendance Chronology
+                            </h4>
+                            <p class="section-subtitle">Detailed Daily Attendance Records</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="glass-table-header">
+                                    <tr>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Arrival Time</th>
+                                        <th scope="col">Departure Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in student.attendance_history %}
+                                    <tr class="hover-scale">
+                                        <td>{{ record.date_full }}</td>
+                                        <td>
+                                            {{ record.status }}
+                                            {% if record.status == 'Present' %}<span class="badge bg-success ms-2">P</span>
+                                            {% elif record.status == 'Absent' %}<span class="badge bg-danger ms-2">A</span>
+                                            {% else %}<span class="badge bg-secondary ms-2">Off</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ record.arrival_time or '--' }}</td>
+                                        <td>{{ record.departure_time or '--' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Guardian Information -->
-<div class="guardian-info mt-4">
-    <h4 class="section-title">📌 Guardian Details</h4>
-    <div class="detail-card elevated-card p-3">
-        <div class="guardian-name mb-2">
-            <i class="bi bi-person-badge-fill me-2"></i>
-            {{ student.stud_parent_name }}
-        </div>
-        <div class="guardian-contact mb-2">
-            <i class="bi bi-telephone-fill me-2"></i>
-            {{ student.stud_parent_contact_number }}
-        </div>
-        <div class="guardian-cnic">
-            <i class="bi bi-credit-card-2-front-fill me-2"></i>
-            {{ student.stud_parent_id }}
-        </div>
-    </div>
-</div>
-
-<!-- Attendance History -->
-<div class="attendance-history mt-5">
-    <div class="history-header text-center">
-        <h4 class="section-title">
-            <i class="bi bi-clock-history"></i> Attendance Chronology
-        </h4>
-        <p class="section-subtitle">Detailed Daily Attendance Records</p>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="glass-table-header">
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Arrival Time</th>
-                    <th scope="col">Departure Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Dummy Records -->
-                <tr class="hover-scale">
-                    <td>02-03-2025</td>
-                    <td>
-                        Present
-                        <span class="badge bg-success ms-2">P</span>
-                    </td>
-                    <td>08:30</td>
-                    <td>13:45</td>
-                </tr>
-                <tr class="hover-scale">
-                    <td>01-03-2025</td>
-                    <td>
-                        Present
-                        <span class="badge bg-success ms-2">P</span>
-                    </td>
-                    <td>08:35</td>
-                    <td>13:40</td>
-                </tr>
-                <tr class="hover-scale">
-                    <td>29-02-2025</td>
-                    <td>
-                        Absent
-                        <span class="badge bg-danger ms-2">A</span>
-                    </td>
-                    <td>--</td>
-                    <td>--</td>
-                </tr>
-                <tr class="hover-scale">
-                    <td>28-02-2025</td>
-                    <td>
-                        Present
-                        <span class="badge bg-success ms-2">P</span>
-                    </td>
-                    <td>08:25</td>
-                    <td>13:30</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Export Section -->
-<form method="POST" class="export-section mt-5">
-    <input type="hidden" name="student_id" value="4301">
-    <div class="row g-3 align-items-center">
-        <div class="col-md-8">
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" 
-                       name="export_option" id="exportAll" 
-                       value="all">
-                <label class="form-check-label" for="exportAll">
-                    <i class="bi bi-archive me-1"></i>
-                    Complete History
-                </label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" 
-                       name="export_option" id="exportCurrent" 
-                       value="current_class" checked>
-                <label class="form-check-label" for="exportCurrent">
-                    <i class="bi bi-calendar-month me-1"></i>
-                    Current Class
-                </label>
-            </div>
-        </div>
-        <div class="col-md-4 text-end">
-            <button type="submit" name="export" 
-                    class="btn btn-gradient hover-grow">
-                <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                Generate Report
-            </button>
-        </div>
-    </div>
-</form>
-
 </body>
 </html>
